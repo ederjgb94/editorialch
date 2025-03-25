@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreBookRequest;
@@ -21,8 +22,7 @@ class BookController extends Controller
      */
     public function store(StoreBookRequest $request)
     {
-        $book = Book::create($request);
-
+        $book = Book::create($request->validated());
         return response()->json($book, 201);
     }
 
@@ -40,7 +40,6 @@ class BookController extends Controller
     public function update(Request $request, Book $book)
     {
         $book->update($request->all());
-
         return response()->json($book);
     }
 
@@ -50,7 +49,6 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         $book->delete();
-
         return response()->json(null, 204);
     }
 }
