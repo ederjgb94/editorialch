@@ -3,6 +3,9 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8 border-b border-gray-200 pb-6">
+        <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+            ← Volver al Panel de Control
+        </a>
         <h1 class="font-serif text-4xl font-bold text-gray-900 mb-2">Catálogo de Publicaciones</h1>
         <p class="text-lg text-gray-600">Publicaciones académicas y de investigación</p>
     </div>
@@ -57,20 +60,16 @@
                                 <div class="text-sm text-gray-600">{{ $book->edition }}</div>
                             </td>
                             <td class="px-6 py-4 text-sm font-medium space-x-2">
-                                <a href="{{ route('books.show', $book) }}" 
-                                   class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#013243]">
+                                <a href="{{ route('books.show', $book) }}" class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#013243]">
                                     Ver
                                 </a>
-                                <a href="{{ route('books.edit', $book) }}" 
-                                   class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#013243]">
+                                <a href="{{ route('books.edit', $book) }}" class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#013243]">
                                     Editar
                                 </a>
                                 <form action="{{ route('books.destroy', $book) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" 
-                                            onclick="return confirm('¿Está seguro de eliminar esta publicación?')"
-                                            class="inline-flex items-center px-2.5 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    <button type="submit" onclick="return confirm('¿Está seguro de eliminar esta publicación?')" class="inline-flex items-center px-2.5 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                         Eliminar
                                     </button>
                                 </form>
