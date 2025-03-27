@@ -42,7 +42,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Sección de Enlaces Rápidos -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">

@@ -11,11 +11,6 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
-                'name' => 'Cliente',
-                'slug' => 'cliente',
-                'description' => 'Usuario cliente del sistema'
-            ],
-            [
                 'name' => 'Asociado Autor',
                 'slug' => 'asociado-autor',
                 'description' => 'Autor asociado que puede publicar contenido'
@@ -23,12 +18,12 @@ class RoleSeeder extends Seeder
             [
                 'name' => 'Asociado Árbitro',
                 'slug' => 'asociado-arbitro',
-                'description' => 'Árbitro que puede revisar y evaluar contenido'
+                'description' => 'Árbitro finaliza la revisión de un libro'
             ],
             [
                 'name' => 'Asociado Editor',
                 'slug' => 'asociado-editor',
-                'description' => 'Editor que puede gestionar contenido'
+                'description' => 'Editor que puede gestionar contenido y revisiones de libros de los autores'
             ],
             [
                 'name' => 'Administrador',
