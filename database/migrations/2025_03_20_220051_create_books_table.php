@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('pages')->nullable();
             $table->text('description')->nullable();
             $table->string('cover', 255)->nullable();
+            $table->string('pdf_path')->nullable();
             $table->timestamps();
         });
     }

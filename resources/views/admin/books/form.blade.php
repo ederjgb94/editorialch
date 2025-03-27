@@ -51,6 +51,18 @@
         @endif
     </div>
 
+    <div>
+        <label for="pdf_file" class="block text-sm font-medium text-gray-700">PDF del Libro</label>
+        <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" class="mt-1 block w-full">
+        @if(isset($book) && $book->pdf_path)
+            <div class="mt-2">
+                <a href="{{ asset('storage/' . $book->pdf_path) }}" class="text-blue-600 hover:text-blue-800" target="_blank">
+                    Ver PDF actual
+                </a>
+            </div>
+        @endif
+    </div>
+
     <div class="flex justify-end space-x-3">
         <a href="{{ route('admin.books.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50">
             Cancelar

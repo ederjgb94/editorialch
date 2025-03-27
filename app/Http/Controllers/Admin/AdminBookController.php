@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminBookController extends Controller
 {
@@ -30,11 +31,17 @@ class AdminBookController extends Controller
             'volume' => 'nullable|integer',
             'pages' => 'nullable|integer',
             'description' => 'nullable|string',
-            'cover' => 'nullable|image|max:2048'
+            'cover' => 'nullable|image|max:2048',
+            'pdf_file' => 'nullable|mimes:pdf|max:10240'
         ]);
 
         if ($request->hasFile('cover')) {
             $validated['cover'] = $request->file('cover')->store('covers', 'public');
+        }
+
+        if ($request->hasFile('pdf_file')) {
+            $isbn = $validated['isbn'];
+            $validated['pdf_path'] = $request->file('pdf_file')->storeAs('libros', $isbn . '.pdf', 'public');
         }
 
         Book::create($validated);
@@ -57,11 +64,25 @@ class AdminBookController extends Controller
             'volume' => 'nullable|integer',
             'pages' => 'nullable|integer',
             'description' => 'nullable|string',
-            'cover' => 'nullable|image|max:2048'
+            'cover' => 'nullable|image|max:2048',
+            'pdf_file' => 'nullable|mimes:pdf|max:10240'
         ]);
 
         if ($request->hasFile('cover')) {
+            // Eliminar la imagen anterior si existe
+            if ($book->cover) {
+                Storage::disk('public')->delete($book->cover);
+            }
             $validated['cover'] = $request->file('cover')->store('covers', 'public');
+        }
+
+        if ($request->hasFile('pdf_file')) {
+            // Eliminar el PDF anterior si existe
+            if ($book->pdf_path) {
+                Storage::disk('public')->delete($book->pdf_path);
+            }
+            $isbn = $validated['isbn'];
+            $validated['pdf_path'] = $request->file('pdf_file')->storeAs('libros', $isbn . '.pdf', 'public');
         }
 
         $book->update($validated);
@@ -70,6 +91,14 @@ class AdminBookController extends Controller
 
     public function destroy(Book $book)
     {
+        // Eliminar archivos asociados
+        if ($book->cover) {
+            Storage::disk('public')->delete($book->cover);
+        }
+        if ($book->pdf_path) {
+            Storage::disk('public')->delete($book->pdf_path);
+        }
+
         $book->delete();
         return redirect()->route('admin.books.index')->with('success', 'Libro eliminado exitosamente');
     }

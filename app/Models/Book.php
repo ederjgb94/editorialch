@@ -20,5 +20,6 @@ class Book extends Model
         'pages',
         'description',
         'cover',
+        'pdf_path',
     ];
 }
