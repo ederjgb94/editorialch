@@ -102,4 +102,25 @@ class AdminBookController extends Controller
         $book->delete();
         return redirect()->route('admin.books.index')->with('success', 'Libro eliminado exitosamente');
     }
+
+    public function search(Request $request)
+    {
+        $search = $request->get('search');
+
+        // Si no hay término de búsqueda, redirigir al index
+        if (empty($search)) {
+            return redirect()->route('admin.books.index');
+        }
+
+        // Primero obtenemos los libros que coinciden con la búsqueda
+        $matchingBooks = Book::where('title', 'LIKE', "%{$search}%");
+
+        // Luego obtenemos los libros que no coinciden con la búsqueda
+        $otherBooks = Book::where('title', 'NOT LIKE', "%{$search}%");
+
+        // Unimos ambas consultas usando union
+        $books = $matchingBooks->union($otherBooks)->paginate(10);
+
+        return view('admin.books.index', compact('books', 'search'));
+    }
 }

@@ -10,5 +10,6 @@ Route::prefix('v1')->group(function () {
         return Auth::user();
     })->middleware('auth:sanctum');
 
+    Route::get('books/search', [BookController::class, 'search']);
     Route::apiResource('books', BookController::class);
 });

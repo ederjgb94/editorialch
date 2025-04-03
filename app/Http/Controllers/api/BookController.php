@@ -51,4 +51,47 @@ class BookController extends Controller
         $book->delete();
         return response()->json(null, 204);
     }
+
+    /**
+     * Search for books and return matching results first, followed by non-matching results
+     */
+    public function search(Request $request)
+    {
+        $search = $request->get('title') ?? $request->get('partner') ?? $request->get('publication_date');
+        $searchField = null;
+
+        if ($request->has('title')) {
+            $searchField = 'title';
+        } elseif ($request->has('partner')) {
+            $searchField = 'partner';
+        } elseif ($request->has('publication_date')) {
+            $searchField = 'publication_date';
+        }
+
+        if (empty($search)) {
+            return response()->json(Book::orderBy('publication_date', 'desc')->paginate(10));
+        }
+
+        // Dividimos la búsqueda en palabras clave
+        $keywords = explode(' ', $search);
+
+        // Obtenemos los libros que coinciden con alguna de las palabras clave
+        $matchingBooks = Book::where(function ($query) use ($searchField, $keywords) {
+            foreach ($keywords as $keyword) {
+                $query->orWhere($searchField, 'LIKE', "%{$keyword}%");
+            }
+        });
+
+        // Obtenemos los libros que no coinciden con ninguna de las palabras clave
+        $otherBooks = Book::where(function ($query) use ($searchField, $keywords) {
+            foreach ($keywords as $keyword) {
+                $query->where($searchField, 'NOT LIKE', "%{$keyword}%");
+            }
+        })->orderBy('publication_date', 'desc');
+
+        // Unimos ambas consultas y paginamos
+        $books = $matchingBooks->union($otherBooks)->paginate(10);
+
+        return response()->json($books);
+    }
 }
