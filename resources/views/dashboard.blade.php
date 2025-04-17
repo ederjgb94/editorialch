@@ -23,6 +23,7 @@
 
             @if(!auth()->user()->roles->isEmpty())
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @if(auth()->user()->hasRole('admin'))
                     <!-- Sección de Libros -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
@@ -57,6 +58,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                     <!-- Sección de Enlaces Rápidos -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
