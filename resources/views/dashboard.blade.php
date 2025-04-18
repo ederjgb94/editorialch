@@ -59,6 +59,42 @@
                         </div>
                     </div>
                     @endif
+
+                    <!-- Sección de Solicitudes de Publicación -->
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                                Solicitudes de Publicación
+                            </h3>
+                            <div class="space-y-4">
+                                <a href="{{ route('submissions.index') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Mis Solicitudes
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Ver el estado de tus solicitudes de publicación
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="{{ route('submissions.create') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Nueva Solicitud
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Enviar una nueva solicitud de publicación
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Sección de Enlaces Rápidos -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
@@ -91,40 +127,6 @@
                                     </div>
                                 </a>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">
-                            Enlaces Disponibles
-                        </h3>
-                        <div class="space-y-4">
-                            <a href="{{ route('profile.edit') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
-                                <div class="flex items-center">
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">
-                                            Mi Perfil
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Gestionar información de la cuenta
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="{{ route('books.index') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
-                                <div class="flex items-center">
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">
-                                            Ver Catálogo Público
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            Visualizar el catálogo como lo ven los usuarios
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
                         </div>
                     </div>
                 </div>
