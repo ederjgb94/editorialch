@@ -1,0 +1,60 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Pagination from "../components/book/Pagination.vue";
+---
+
+<BaseLayout title="Libros">
+    <!-- Título principal -->
+    <h1
+        id="top-of-page"
+        class="text-3xl font-bold text-center text-gray-800 mb-4 sm:mb-6 sm:px-10 lg:mb-8 lg:px-20"
+    >
+        Catálogo ScAsEd
+    </h1>
+
+    <!-- Texto promocional -->
+    <div class="max-w-3xl mx-auto mb-6 text-center px-10">
+        <p class="text-gray-700 italic">
+            Con nuestro catálogo contribuimos a promover el pensamiento crítico,
+            la creación literaria, la cultura y el diálogo entre la Universidad
+            y la sociedad.
+        </p>
+    </div>
+    <div class="max-w-5xl mx-auto px-10">
+        <Pagination client:load />
+    </div>
+    <div class="h-10"></div>
+</BaseLayout>
+
+<script>
+    // Script para desplazarse al inicio de la página cuando cambia la paginación
+    document.addEventListener("DOMContentLoaded", function () {
+        // Verificar si la URL tiene un parámetro de página
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("page")) {
+            // Desplazarse al inicio de la página
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+        }
+
+        // Escuchar cambios en la URL (cuando cambian los parámetros)
+        let lastUrl = location.href;
+        new MutationObserver(() => {
+            const url = location.href;
+            if (url !== lastUrl) {
+                lastUrl = url;
+                // Comprobar si los parámetros han cambiado
+                const newParams = new URLSearchParams(location.search);
+                if (newParams.has("page")) {
+                    // Desplazarse al inicio de la página
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                    });
+                }
+            }
+        }).observe(document, { subtree: true, childList: true });
+    });
+</script>

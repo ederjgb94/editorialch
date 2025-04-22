@@ -1,0 +1,40 @@
+---
+import type { Link } from "../../data/const";
+type Props = {
+    item: Link;
+};
+const currentPath = Astro.url.pathname;
+const { item } = Astro.props;
+
+function isActive(item: Link, currentPath: string) {
+    return (
+        (item.text === "Home" && currentPath === "/") ||
+        (item.text === "Articles" &&
+            currentPath.split("/")[2] !== undefined &&
+            !Number.isNaN(Number(currentPath.split("/")[2])) &&
+            Number(currentPath.split("/")[2]) >= 1) ||
+        (item.text !== "Articles" &&
+            item.text !== "Home" &&
+            currentPath === item.href)
+    );
+}
+
+function formatHref(href: string) {
+    return href === "/" ? "/" : `${href}`;
+}
+---
+
+<li>
+    <a
+        href={formatHref(item.href)}
+        class:list={[
+            "transition-colors duration-300  text-[1.1rem]  font-sans ",
+            isActive(item, currentPath)
+                ? "text-principal font-bold"
+                : "text-gray-600",
+        ]}
+        aria-label={item.text}
+    >
+        {item.text}
+    </a>
+</li>

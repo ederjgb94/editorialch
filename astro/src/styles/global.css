@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+    --color-principal: #274e9c;
+    --color-secundario: #70a2cf;
+    --color-terciario: #cbe1eb;
+    --color-negro: var(--color-gray-800);
+    /* Font Family */
+    --font-sans: "Source Sans Pro", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-serif: "Merriweather", "Source Serif 4 Variable", ui-serif, Georgia, Cambria,
+        "Times New Roman", Times, serif;
+}
+
+@plugin "daisyui" {
+    themes: light --default;
+    root: ":root";
+    logs: false;
+}
+
+
+@layer base {
+    :root {
+        @apply cursor-default;
+    }
+
+    html {
+        @apply h-full text-[16px];
+    }
+
+    @media (min-width: 1024px) {
+        html {
+            @apply text-[17px];
+        }
+    }
+
+    body {
+        @apply font-sans antialiased h-full;
+    }
+
+    h1,
+    h2 {
+        @apply font-serif;
+    }
+
+    small,
+    time {
+        @apply text-sm;
+    }
+
+    /* Estilo para la barra de desplazamiento */
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Estilos para Firefox */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #333 #1a1a1a;
+    }
+
+    .prose {
+        pre {
+            code {
+
+                span,
+                p {
+                    @apply break-all;
+                }
+            }
+        }
+    }
+}
+
+@utility container {
+    margin-inline: auto;
+    padding-inline: 1rem;
+
+    @media (max-width: 640px) {
+        max-width: none;
+    }
+
+    @media (min-width: 1280px) {
+        max-width: 1248px;
+    }
+}
+
+@layer components {
+    .a-01 {
+        @apply hover:underline decoration-primary;
+    }
+}
