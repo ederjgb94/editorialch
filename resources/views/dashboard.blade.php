@@ -61,6 +61,7 @@
                     @endif
 
                     <!-- Sección de Solicitudes de Publicación -->
+                    @if(auth()->user()->hasRole('asociado-autor'))
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-4">
@@ -94,6 +95,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- Sección de Enlaces Rápidos -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
