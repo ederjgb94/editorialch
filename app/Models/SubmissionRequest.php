@@ -20,4 +20,20 @@ class SubmissionRequest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Alias para la relación user, para acceder como "author"
+     */
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Obtiene los árbitros asignados a esta solicitud
+     */
+    public function arbitrators()
+    {
+        return $this->belongsToMany(User::class, 'submission_arbitrator', 'submission_request_id', 'user_id');
+    }
 }

@@ -59,6 +59,15 @@ Route::middleware(['auth', 'role:asociado-arbitro'])->prefix('arbitro')->name('a
 // Rutas para editores
 Route::middleware(['auth', 'role:asociado-editor'])->prefix('editor')->name('editor.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Rutas para gestión de solicitudes y asignación de árbitros
+    Route::get('/submissions', [\App\Http\Controllers\Editor\SubmissionManagementController::class, 'index'])->name('submissions.index');
+    Route::get('/submissions/{submission}/assign', [\App\Http\Controllers\Editor\SubmissionManagementController::class, 'assignArbitrators'])->name('submissions.assign');
+    Route::post('/submissions/{submission}/assign', [\App\Http\Controllers\Editor\SubmissionManagementController::class, 'storeAssignment'])->name('submissions.store-assignment');
+
+    // Rutas para seguimiento de actualizaciones
+    Route::get('/progress', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'index'])->name('progress.index');
+    Route::get('/progress/{submission}', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'show'])->name('progress.show');
 });
 
 // Ruta principal redirige al dashboard
