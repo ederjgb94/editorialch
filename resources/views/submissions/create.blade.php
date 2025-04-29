@@ -65,7 +65,7 @@
                             Cancelar
                         </a>
                         <button type="submit"
-                                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                class="inline-flex justify-center rounded-md border border-gray-300 bg-[#013243] py-2 px-4 text-sm font-medium text-gray-300 shadow-sm bg-gray focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                             Enviar Solicitud
                         </button>
                     </div>
