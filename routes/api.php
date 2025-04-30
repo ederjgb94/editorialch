@@ -10,6 +10,10 @@ Route::prefix('v1')->group(function () {
         return Auth::user();
     })->middleware('auth:sanctum');
 
-    Route::get('books/search', [BookController::class, 'search']);
+    // Definir la ruta de búsqueda antes de la definición de apiResource
+    Route::get('books/search', [BookController::class, 'search'])->name('api.books.search');
     Route::apiResource('books', BookController::class);
 });
+
+// Agregar una ruta alternativa sin el prefijo v1 para mayor compatibilidad
+Route::get('books/search', [BookController::class, 'search'])->name('api.books.search.direct');
