@@ -496,38 +496,30 @@
         // Get the arbitrator element in the reviews section
         const arbitratorElement = document.getElementById('arbitro-' + arbitratorId);
         
-        // Scroll to the element with smooth behavior
         if (arbitratorElement) {
-            // Scroll to the historial-revisiones section first
-            document.getElementById('historial-revisiones').scrollIntoView({ behavior: 'smooth' });
+            // Calcular la posición exacta en un solo paso para evitar animaciones trabadas
+            const yOffset = -80; // Offset para dar un poco de espacio en la parte superior (80px)
+            const elementPosition = arbitratorElement.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition + yOffset;
             
-            // Then add a small delay to ensure the first scroll has completed
+            // Hacer scroll a la posición en un solo movimiento suave
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+            
+            // Añadir efecto de resaltado para mejor visibilidad
+            arbitratorElement.style.transition = 'all 0.5s ease';
+            arbitratorElement.style.backgroundColor = '#EFF6FF'; // Light blue background (Tailwind blue-50)
+            arbitratorElement.style.boxShadow = '0 0 0 2px #BFDBFE'; // Mejor que un borde, no cambia las dimensiones
+            arbitratorElement.style.borderRadius = '0.375rem'; // 6px
+            
+            // Quitar el resaltado después de un tiempo
             setTimeout(() => {
-                // Calculate position to scroll to (slightly above the element for better visibility)
-                const position = arbitratorElement.getBoundingClientRect().top + window.pageYOffset - 100;
-                
-                // Scroll to the calculated position
-                window.scrollTo({
-                    top: position,
-                    behavior: 'smooth'
-                });
-                
-                // Add highlight animation to the arbitrator's section
-                arbitratorElement.style.transition = 'background-color 0.5s ease';
-                arbitratorElement.style.backgroundColor = '#EFF6FF'; // Light blue background (Tailwind blue-50)
-                
-                // Add a subtle border
-                const originalBorder = arbitratorElement.style.border;
-                arbitratorElement.style.border = '1px solid #BFDBFE'; // Tailwind blue-200
-                arbitratorElement.style.borderRadius = '0.375rem'; // 6px
-                
-                // Remove highlight after a delay
-                setTimeout(() => {
-                    arbitratorElement.style.backgroundColor = '';
-                    arbitratorElement.style.border = originalBorder;
-                    arbitratorElement.style.borderRadius = '';
-                }, 2000);
-            }, 300);
+                arbitratorElement.style.backgroundColor = '';
+                arbitratorElement.style.boxShadow = '';
+                arbitratorElement.style.borderRadius = '';
+            }, 2000);
         }
     }
 
