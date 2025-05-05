@@ -43,8 +43,14 @@ class SubmissionManagementController extends Controller
             'arbitrator_ids.*' => 'exists:users,id'
         ]);
 
-        // Asignamos los árbitros seleccionados a la solicitud
-        $submission->arbitrators()->sync($request->arbitrator_ids);
+        // Asignamos los árbitros seleccionados a la solicitud, con timestamps actualizados
+        $arbitratorData = array_fill_keys($request->arbitrator_ids, [
+            'created_at' => now(),
+            'updated_at' => now(),
+            'status' => 'pendiente'
+        ]);
+
+        $submission->arbitrators()->sync($arbitratorData);
 
         // Actualizamos el estado de la solicitud
         $submission->status = 'en_revision';

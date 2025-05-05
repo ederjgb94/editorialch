@@ -47,11 +47,27 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Roles del usuario
+     */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class);
     }
 
+    /**
+     * Solicitudes asignadas al árbitro
+     */
+    public function assignedSubmissions()
+    {
+        return $this->belongsToMany(SubmissionRequest::class, 'submission_arbitrator', 'user_id', 'submission_request_id')
+            ->withPivot('status', 'comments', 'created_at', 'updated_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Verifica si el usuario tiene un rol específico
+     */
     public function hasRole(string $role): bool
     {
         return $this->roles()->where('slug', $role)->exists();

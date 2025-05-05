@@ -34,6 +34,8 @@ class SubmissionRequest extends Model
      */
     public function arbitrators()
     {
-        return $this->belongsToMany(User::class, 'submission_arbitrator', 'submission_request_id', 'user_id');
+        return $this->belongsToMany(User::class, 'submission_arbitrator', 'submission_request_id', 'user_id')
+            ->withPivot('status', 'comments', 'created_at', 'updated_at')
+            ->withTimestamps();
     }
 }

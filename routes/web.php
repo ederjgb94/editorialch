@@ -54,6 +54,9 @@ Route::middleware(['auth', 'role:asociado-autor'])->prefix('autor')->name('autor
 // Rutas para árbitros
 Route::middleware(['auth', 'role:asociado-arbitro'])->prefix('arbitro')->name('arbitro.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/submissions', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'index'])->name('submissions');
+    Route::get('/submissions/{submission}', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'show'])->name('submissions.show');
+    Route::post('/submissions/{submission}/evaluate', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'evaluate'])->name('submissions.evaluate');
 });
 
 // Rutas para editores

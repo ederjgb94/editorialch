@@ -144,6 +144,36 @@
                     </div>
                     @endif
 
+                    <!-- Sección de Evaluación para Árbitros -->
+                    @if(auth()->user()->hasRole('asociado-arbitro'))
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                                Evaluación
+                            </h3>
+                            <div class="space-y-4">
+                                <a href="{{ route('arbitro.submissions') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-6 w-6 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Mis Solicitudes Asignadas
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Ver y evaluar las solicitudes asignadas para revisión
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Sección de Enlaces Rápidos -->
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
