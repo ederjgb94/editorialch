@@ -57,4 +57,52 @@ class ProgressTrackingController extends Controller
 
         return view('editor.progress.show', compact('submission', 'reviewHistory', 'reviewsByArbitrator'));
     }
+
+    /**
+     * Aprueba una solicitud después de verificar que todos los árbitros han completado sus evaluaciones.
+     */
+    public function approveSubmission(SubmissionRequest $submission)
+    {
+        // Cargar las relaciones de árbitros
+        $submission->load('arbitrators');
+
+        // Verificar que todos los árbitros hayan completado su evaluación
+        $allCompleted = true;
+        $arbitratorsCount = $submission->arbitrators->count();
+
+        if ($arbitratorsCount === 0) {
+            return redirect()->back()->with('error', 'No se puede aprobar la solicitud sin árbitros asignados.');
+        }
+
+        // Verificar si todos los árbitros han completado su evaluación
+        $completedCount = $submission->arbitrators->filter(function ($arbitrator) {
+            return $arbitrator->pivot->status === 'completado';
+        })->count();
+
+        if ($completedCount < $arbitratorsCount) {
+            return redirect()->back()->with(
+                'error',
+                'No es posible aprobar la solicitud. Faltan ' . ($arbitratorsCount - $completedCount) .
+                    ' árbitros por completar su evaluación.'
+            );
+        }
+
+        // Si todos los árbitros han completado sus evaluaciones, aprobar la solicitud
+        $submission->status = 'aprobado';
+        $submission->save();
+
+        return redirect()->back()->with('success', 'La solicitud ha sido aprobada exitosamente.');
+    }
+
+    /**
+     * Rechaza una solicitud de publicación.
+     */
+    public function rejectSubmission(SubmissionRequest $submission)
+    {
+        // Cambiar el estado de la solicitud a rechazado
+        $submission->status = 'rechazado';
+        $submission->save();
+
+        return redirect()->back()->with('success', 'La solicitud ha sido rechazada.');
+    }
 }
