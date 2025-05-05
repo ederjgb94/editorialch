@@ -11,7 +11,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Deshabilitar cache en entorno local
+        if ($this->app->environment('local')) {
+            $this->app->singleton('files.changed', function () {
+                return true;
+            });
+        }
     }
 
     /**

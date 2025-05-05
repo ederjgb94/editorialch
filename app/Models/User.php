@@ -61,8 +61,16 @@ class User extends Authenticatable
     public function assignedSubmissions()
     {
         return $this->belongsToMany(SubmissionRequest::class, 'submission_arbitrator', 'user_id', 'submission_request_id')
-            ->withPivot('status', 'comments', 'created_at', 'updated_at')
+            ->withPivot('status', 'comments', 'review_document_path', 'created_at', 'updated_at')
             ->withTimestamps();
+    }
+
+    /**
+     * Revisiones realizadas por este árbitro
+     */
+    public function reviews()
+    {
+        return $this->hasMany(SubmissionReview::class);
     }
 
     /**

@@ -57,6 +57,7 @@ Route::middleware(['auth', 'role:asociado-arbitro'])->prefix('arbitro')->name('a
     Route::get('/submissions', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'index'])->name('submissions');
     Route::get('/submissions/{submission}', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'show'])->name('submissions.show');
     Route::post('/submissions/{submission}/evaluate', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'evaluate'])->name('submissions.evaluate');
+    Route::put('/submissions/{submission}/update-status', [\App\Http\Controllers\Arbitrator\SubmissionController::class, 'updateStatus'])->name('submissions.update-status');
 });
 
 // Rutas para editores

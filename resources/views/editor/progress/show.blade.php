@@ -162,6 +162,17 @@
                         @endif
                     </div>
                 @else
+                    @if(isset($reviewHistory) && $reviewHistory->count() > 0)
+                        <div class="mb-4 px-3 py-2 bg-blue-50 rounded-md border border-blue-100">
+                            <p class="text-sm text-blue-800 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                                </svg>
+                                Se han recibido {{ $reviewHistory->count() }} revisiones en total. Consulta el <a href="#historial-revisiones" class="font-medium underline">historial completo de revisiones</a> más abajo.
+                            </p>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @foreach($submission->arbitrators as $arbitrator)
                             <div class="border border-gray-200 rounded-lg p-4 bg-white">
@@ -198,10 +209,25 @@
                                     </div>
                                 </div>
                                 
-                                @if($arbitrator->pivot->comments)
+                                @if(isset($reviewsByArbitrator) && isset($reviewsByArbitrator[$arbitrator->id]) && $reviewsByArbitrator[$arbitrator->id]->count() > 0)
                                     <div class="bg-gray-50 p-3 rounded-lg">
-                                        <p class="text-xs font-medium text-gray-500 mb-1">Comentarios:</p>
-                                        <p class="text-sm text-gray-700">{{ $arbitrator->pivot->comments }}</p>
+                                        <div class="flex justify-between items-center mb-2">
+                                            <p class="text-xs font-medium text-gray-500">Revisiones realizadas:</p>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                {{ $reviewsByArbitrator[$arbitrator->id]->count() }}
+                                            </span>
+                                        </div>
+                                        <a href="#arbitro-{{ $arbitrator->id }}" class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Ver todas las revisiones
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-500">
+                                        No ha realizado revisiones todavía
                                     </div>
                                 @endif
                             </div>
@@ -212,7 +238,198 @@
         </div>
     </div>
 
-    <!-- Tercera fila: Historial de Actividad -->
+    <!-- Tercera fila: Historial de Revisiones -->
+    <div id="historial-revisiones" class="mb-6">
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">Historial de Revisiones y Observaciones</h2>
+                @if(isset($reviewHistory) && $reviewHistory->count() > 0)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ $reviewHistory->count() }} Revisiones
+                    </span>
+                @endif
+            </div>
+            <div class="p-4">
+                @if(isset($reviewHistory) && $reviewHistory->count() > 0)
+                    <!-- Pestañas para elegir vista -->
+                    <div class="mb-6 border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-6">
+                            <a href="#" id="btn-chronological" class="border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" onclick="toggleView('chronological'); return false;">
+                                Vista Cronológica
+                            </a>
+                            <a href="#" id="btn-by-arbitrator" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" onclick="toggleView('by-arbitrator'); return false;">
+                                Por Árbitro
+                            </a>
+                        </nav>
+                    </div>
+                    
+                    <!-- Vista cronológica (por defecto) -->
+                    <div id="chronological-view">
+                        <div class="flow-root">
+                            <ul class="-mb-8">
+                                @foreach($reviewHistory as $index => $review)
+                                    <li>
+                                        <div class="relative pb-8">
+                                            @if($index !== $reviewHistory->count() - 1)
+                                                <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                            @endif
+                                            <div class="relative flex items-start space-x-3">
+                                                <div class="relative">
+                                                    <div class="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100">
+                                                        <span class="text-sm font-medium text-blue-600">
+                                                            {{ strtoupper(substr($review->arbitrator->name, 0, 2)) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="min-w-0 flex-1 bg-gray-50 rounded-lg p-4">
+                                                    <div class="flex justify-between items-center mb-1">
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $review->arbitrator->name }}
+                                                            <span class="ml-2 text-xs text-gray-500">
+                                                                {{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y H:i') }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="space-y-4">
+                                                        @if($review->comments)
+                                                            <div>
+                                                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Comentarios:</h4>
+                                                                <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                                                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ $review->comments }}</p>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                        
+                                                        @if($review->document_path)
+                                                            <div>
+                                                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Documento de Revisión:</h4>
+                                                                <a href="{{ asset('storage/' . $review->document_path) }}" 
+                                                                    target="_blank"
+                                                                    class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2 text-blue-600">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                                    </svg>
+                                                                    Descargar Documento de Observaciones
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Vista por árbitro (oculta por defecto) -->
+                    <div id="by-arbitrator-view" class="hidden">
+                        <div class="space-y-8">
+                            @foreach($reviewsByArbitrator as $arbitratorId => $reviews)
+                                @php
+                                    $arbitrator = $reviews->first()->arbitrator;
+                                @endphp
+                                <div id="arbitro-{{ $arbitratorId }}" class="border-t pt-6 border-gray-200">
+                                    <div class="flex items-center mb-4">
+                                        <div class="flex-shrink-0">
+                                            <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                                                <span class="text-lg font-medium text-blue-600">
+                                                    {{ strtoupper(substr($arbitrator->name, 0, 2)) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h2 class="text-lg font-medium text-gray-900">{{ $arbitrator->name }}</h2>
+                                            <p class="text-sm text-gray-500">{{ $arbitrator->email }}</p>
+                                        </div>
+                                        <div class="ml-auto">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                {{ $reviews->count() }} Revisiones
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="ml-12">
+                                        <div class="flow-root">
+                                            <ul class="-mb-8">
+                                                @foreach($reviews as $index => $review)
+                                                    <li>
+                                                        <div class="relative pb-8">
+                                                            @if($index !== $reviews->count() - 1)
+                                                                <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                                            @endif
+                                                            <div class="relative flex items-start space-x-3">
+                                                                <div>
+                                                                    <div class="relative px-1">
+                                                                        <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center ring-8 ring-white">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-blue-600">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                                                            </svg>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="min-w-0 flex-1 py-1.5">
+                                                                    <div class="text-sm text-gray-500">
+                                                                        <span class="font-medium text-gray-900">Revisión realizada</span>
+                                                                        <span class="ml-2 text-gray-500">
+                                                                            {{ $review->created_at->format('d/m/Y H:i') }}
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    <div class="mt-2 bg-gray-50 p-3 rounded-lg border border-gray-100 space-y-4">
+                                                                        @if($review->comments)
+                                                                            <div>
+                                                                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Comentarios:</h4>
+                                                                                <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                                                                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ $review->comments }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endif
+                                                                        
+                                                                        @if($review->document_path)
+                                                                            <div>
+                                                                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Documento adjunto:</h4>
+                                                                                <a href="{{ asset('storage/' . $review->document_path) }}" 
+                                                                                    target="_blank"
+                                                                                    class="flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1.5 text-blue-600">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                                                    </svg>
+                                                                                    Descargar documento
+                                                                                </a>
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center py-6">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay revisiones disponibles</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Los árbitros aún no han enviado observaciones o documentos de revisión.
+                        </p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cuarta fila: Historial de Actividad -->
     <div class="mb-6">
         <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
             <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
@@ -246,4 +463,31 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function toggleView(view) {
+        const chronologicalView = document.getElementById('chronological-view');
+        const byArbitratorView = document.getElementById('by-arbitrator-view');
+        const btnChronological = document.getElementById('btn-chronological');
+        const btnByArbitrator = document.getElementById('btn-by-arbitrator');
+        
+        if (view === 'chronological') {
+            chronologicalView.classList.remove('hidden');
+            byArbitratorView.classList.add('hidden');
+            btnChronological.classList.add('border-blue-500', 'text-blue-600');
+            btnChronological.classList.remove('border-transparent', 'text-gray-500');
+            btnByArbitrator.classList.add('border-transparent', 'text-gray-500');
+            btnByArbitrator.classList.remove('border-blue-500', 'text-blue-600');
+        } else {
+            chronologicalView.classList.add('hidden');
+            byArbitratorView.classList.remove('hidden');
+            btnChronological.classList.add('border-transparent', 'text-gray-500');
+            btnChronological.classList.remove('border-blue-500', 'text-blue-600');
+            btnByArbitrator.classList.add('border-blue-500', 'text-blue-600');
+            btnByArbitrator.classList.remove('border-transparent', 'text-gray-500');
+        }
+    }
+</script>
+@endpush
 @endsection

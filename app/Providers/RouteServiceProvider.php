@@ -24,8 +24,42 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureRateLimiting();
+
+        // Deshabilitar la caché de rutas en entorno local
+        if ($this->app->environment('local')) {
+            $this->app->booted(function () {
+                $this->disableRouteCache();
+            });
+        }
+
+        $this->routes(function () {
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/api.php'));
+
+            Route::middleware('web')
+                ->group(base_path('routes/web.php'));
+        });
+    }
+
+    /**
+     * Configure the rate limiters for the application.
+     */
+    protected function configureRateLimiting(): void
+    {
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+    }
+
+    /**
+     * Disable route cache in local environment
+     */
+    protected function disableRouteCache(): void
+    {
+        if (file_exists($this->app->getCachedRoutesPath())) {
+            unlink($this->app->getCachedRoutesPath());
+        }
     }
 }
