@@ -35,5 +35,8 @@
             <!-- Footer -->
             @include('components.footer')
         </div>
+        
+        <!-- Stacked Scripts -->
+        @stack('scripts')
     </body>
 </html>
