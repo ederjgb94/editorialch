@@ -168,7 +168,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                                 </svg>
-                                Se han recibido {{ $reviewHistory->count() }} revisiones en total. Consulta el <a href="#historial-revisiones" class="font-medium underline">historial completo de revisiones</a> más abajo.
+                                Se han recibido {{ $reviewHistory->count() }} revisiones en total. Consulta el <a href="javascript:void(0);" onclick="document.getElementById('historial-revisiones').scrollIntoView({behavior: 'smooth'})" class="font-medium underline">historial completo de revisiones</a> más abajo.
                             </p>
                         </div>
                     @endif
@@ -217,7 +217,7 @@
                                                 {{ $reviewsByArbitrator[$arbitrator->id]->count() }}
                                             </span>
                                         </div>
-                                        <a href="#arbitro-{{ $arbitrator->id }}" class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                                        <a href="javascript:void(0);" onclick="goToArbitratorReviews({{ $arbitrator->id }})" class="text-sm text-blue-600 hover:text-blue-800 flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -331,7 +331,7 @@
                                 @php
                                     $arbitrator = $reviews->first()->arbitrator;
                                 @endphp
-                                <div id="arbitro-{{ $arbitratorId }}" class="border-t pt-6 border-gray-200">
+                                <div id="arbitro-{{ $arbitratorId }}" class="border-t pt-6 border-gray-200 transition-all">
                                     <div class="flex items-center mb-4">
                                         <div class="flex-shrink-0">
                                             <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
@@ -489,9 +489,58 @@
         }
     }
 
+    function goToArbitratorReviews(arbitratorId) {
+        // Make sure we're in the "Por Árbitro" view
+        toggleView('by-arbitrator');
+        
+        // Get the arbitrator element in the reviews section
+        const arbitratorElement = document.getElementById('arbitro-' + arbitratorId);
+        
+        // Scroll to the element with smooth behavior
+        if (arbitratorElement) {
+            // Scroll to the historial-revisiones section first
+            document.getElementById('historial-revisiones').scrollIntoView({ behavior: 'smooth' });
+            
+            // Then add a small delay to ensure the first scroll has completed
+            setTimeout(() => {
+                // Calculate position to scroll to (slightly above the element for better visibility)
+                const position = arbitratorElement.getBoundingClientRect().top + window.pageYOffset - 100;
+                
+                // Scroll to the calculated position
+                window.scrollTo({
+                    top: position,
+                    behavior: 'smooth'
+                });
+                
+                // Add highlight animation to the arbitrator's section
+                arbitratorElement.style.transition = 'background-color 0.5s ease';
+                arbitratorElement.style.backgroundColor = '#EFF6FF'; // Light blue background (Tailwind blue-50)
+                
+                // Add a subtle border
+                const originalBorder = arbitratorElement.style.border;
+                arbitratorElement.style.border = '1px solid #BFDBFE'; // Tailwind blue-200
+                arbitratorElement.style.borderRadius = '0.375rem'; // 6px
+                
+                // Remove highlight after a delay
+                setTimeout(() => {
+                    arbitratorElement.style.backgroundColor = '';
+                    arbitratorElement.style.border = originalBorder;
+                    arbitratorElement.style.borderRadius = '';
+                }, 2000);
+            }, 300);
+        }
+    }
+
     // Initialize with "Por Árbitro" view by default
     document.addEventListener('DOMContentLoaded', function() {
         toggleView('by-arbitrator');
+        
+        // Check if there's a hash in the URL that points to an arbitrator
+        if (window.location.hash && window.location.hash.startsWith('#arbitro-')) {
+            const arbitratorId = window.location.hash.replace('#arbitro-', '');
+            // Use parseInt to convert the string to a number
+            goToArbitratorReviews(parseInt(arbitratorId));
+        }
     });
 </script>
 @endpush
