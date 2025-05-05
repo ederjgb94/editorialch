@@ -54,7 +54,7 @@
                                 <a href="{{ Storage::url($submission->manuscript_path) }}" 
                                    target="_blank"
                                    class="text-indigo-600 hover:text-indigo-900 text-sm">
-                                    Descargar manuscrito
+                                    Descargar manuscrito (Word)
                                 </a>
                             </dd>
                         </div>

@@ -28,7 +28,7 @@ class SubmissionRequestController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'manuscript' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'manuscript' => 'required|file|mimes:doc,docx|max:10240',
         ]);
 
         $manuscriptPath = $request->file('manuscript')->store('manuscripts', 'public');

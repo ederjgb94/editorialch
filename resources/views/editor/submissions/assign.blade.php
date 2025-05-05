@@ -66,15 +66,15 @@
                     </div>
                 </dl>
                 
-                @if($submission->document_path)
+                @if($submission->manuscript_path)
                     <div class="mt-6 pt-6 border-t border-gray-200">
-                        <h3 class="text-sm font-medium text-gray-900 mb-2">Documento Adjunto</h3>
-                        <a href="{{ asset('storage/' . $submission->document_path) }}" target="_blank" 
+                        <h3 class="text-sm font-medium text-gray-900 mb-2">Manuscrito Adjunto</h3>
+                        <a href="{{ asset('storage/' . $submission->manuscript_path) }}" target="_blank" 
                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#013243] hover:bg-[#014357] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#013243]">
                             <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Ver Documento
+                            Ver Manuscrito (Word)
                         </a>
                     </div>
                 @endif
