@@ -1,6 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .col-id { width: 80px; }
+    .col-title { width: 30%; }
+    .col-author { width: 25%; }
+    .col-date { width: 20%; }
+    .col-actions { width: 15%; }
+    
+    /* Para asegurar que las tablas ocupan el mismo ancho */
+    .table-fixed {
+        table-layout: fixed;
+        width: 100%;
+    }
+</style>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8 border-b border-gray-200 pb-6">
         <a href="{{ route('dashboard') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
@@ -32,12 +45,12 @@
                         <table class="min-w-full divide-y divide-blue-200">
                             <thead class="bg-blue-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Título</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Autor</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider col-id">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider col-title">Título</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider col-author">Autor</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Árbitros</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Estado</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-blue-900 uppercase tracking-wider">Acciones</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-blue-900 uppercase tracking-wider col-actions">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
@@ -53,15 +66,15 @@
             @else
                 <div class="bg-white shadow-sm rounded-lg border border-blue-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-blue-200">
+                        <table class="min-w-full divide-y divide-blue-200 table-fixed">
                             <thead class="bg-blue-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Título</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Autor</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider col-id">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider col-title">Título</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider col-author">Autor</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Árbitros</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-900 uppercase tracking-wider">Estado</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-blue-900 uppercase tracking-wider">Acciones</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-blue-900 uppercase tracking-wider col-actions">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-blue-100">
@@ -150,12 +163,12 @@
                         <table class="min-w-full divide-y divide-yellow-200">
                             <thead class="bg-yellow-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Título</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Autor</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Fecha de envío</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-id">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-title">Título</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-author">Autor</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-date">Fecha de envío</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Estado</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-yellow-900 uppercase tracking-wider">Acciones</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-yellow-900 uppercase tracking-wider col-actions">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white">
@@ -171,15 +184,15 @@
             @else
                 <div class="bg-white shadow-sm rounded-lg border border-yellow-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-yellow-200">
+                        <table class="min-w-full divide-y divide-yellow-200 table-fixed">
                             <thead class="bg-yellow-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Título</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Autor</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Fecha de envío</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-id">ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-title">Título</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-author">Autor</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider col-date">Fecha de envío</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-900 uppercase tracking-wider">Estado</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-yellow-900 uppercase tracking-wider">Acciones</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-yellow-900 uppercase tracking-wider col-actions">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-yellow-100">
@@ -245,11 +258,11 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">ID</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Título</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Autor</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Fecha</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Acciones</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-id">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-title">Título</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-author">Autor</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-date">Fecha</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider col-actions">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
@@ -265,32 +278,32 @@
                 @else
                     <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200 table-fixed">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">ID</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Título</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Autor</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Fecha</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Acciones</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-id">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-title">Título</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-author">Autor</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider col-date">Fecha</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider col-actions">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
                                     @foreach($approvedSubmissions as $submission)
                                         <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 col-id">
                                                 #{{ $submission->id }}
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-900">
+                                            <td class="px-6 py-4 text-sm text-gray-900 col-title">
                                                 {{ $submission->title }}
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
+                                            <td class="px-6 py-4 text-sm text-gray-500 col-author">
                                                 {{ $submission->user->name }}
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
+                                            <td class="px-6 py-4 text-sm text-gray-500 col-date">
                                                 {{ $submission->updated_at->format('d/m/Y') }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium col-actions">
                                                 <a href="{{ route('editor.progress.show', $submission) }}" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
                                                     Ver detalles
                                                     <svg class="ml-1.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -327,11 +340,11 @@
                             <table class="min-w-full divide-y divide-red-200">
                                 <thead class="bg-red-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">ID</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">Título</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">Autor</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">Fecha</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-red-900 uppercase tracking-wider">Acciones</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-id">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-title">Título</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-author">Autor</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-date">Fecha</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-red-900 uppercase tracking-wider col-actions">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white">
@@ -347,32 +360,32 @@
                 @else
                     <div class="bg-white shadow-sm rounded-lg border border-red-100">
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-red-200">
+                            <table class="min-w-full divide-y divide-red-200 table-fixed">
                                 <thead class="bg-red-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">ID</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">Título</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">Autor</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider">Fecha</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-red-900 uppercase tracking-wider">Acciones</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-id">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-title">Título</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-author">Autor</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-900 uppercase tracking-wider col-date">Fecha</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-red-900 uppercase tracking-wider col-actions">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-red-100">
                                     @foreach($rejectedSubmissions as $submission)
                                         <tr class="hover:bg-red-50">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-900 col-id">
                                                 #{{ $submission->id }}
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-900">
+                                            <td class="px-6 py-4 text-sm text-gray-900 col-title">
                                                 {{ $submission->title }}
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
+                                            <td class="px-6 py-4 text-sm text-gray-500 col-author">
                                                 {{ $submission->user->name }}
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
+                                            <td class="px-6 py-4 text-sm text-gray-500 col-date">
                                                 {{ $submission->updated_at->format('d/m/Y') }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium col-actions">
                                                 <a href="{{ route('editor.progress.show', $submission) }}" 
                                                    class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
                                                     Ver detalles
