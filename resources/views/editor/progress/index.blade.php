@@ -299,27 +299,6 @@
                                                 </a>
                                             </td>
                                         </tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                #{{ $submission->id }}
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-900">
-                                                {{ $submission->title }}
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
-                                                {{ $submission->user->name }}
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
-                                                {{ $submission->updated_at->format('d/m/Y') }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <a href="{{ route('editor.progress.show', $submission) }}" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50">
-                                                    Ver detalles
-                                                    <svg class="ml-1.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            </td>
-                                        </tr>
                                     @endforeach
                                 </tbody>
                             </table>
