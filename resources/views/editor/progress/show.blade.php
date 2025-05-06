@@ -142,6 +142,16 @@
                 <div class="prose max-w-none">
                     {{ $submission->description ?? 'No hay descripción disponible.' }}
                 </div>
+                @if($submission->manuscript_path)
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <a href="{{ asset('storage/' . $submission->manuscript_path) }}" target="_blank" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 w-full">
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Ver Manuscrito (Word)
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -150,73 +160,71 @@
             <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
                 <h2 class="text-lg font-medium text-gray-900">Acciones</h2>
             </div>
-            <div class="p-4 space-y-3">
-                @if($submission->status == 'pendiente')
-                    <a href="{{ route('editor.submissions.assign', $submission) }}" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Asignar Árbitros
-                    </a>
-                @endif
-                
-                @if($submission->status == 'en_revision')
+            <div class="p-4 space-y-4">
+                @if($submission->status === 'en_revision' || $submission->status === 'pendiente')
                     @php
-                        $arbitratorsCount = $submission->arbitrators->count();
-                        $completedCount = $submission->arbitrators->filter(function ($arbitrator) {
+                        $allArbitratorsCompleted = $submission->arbitrators->isNotEmpty() && $submission->arbitrators->every(function ($arbitrator) {
                             return $arbitrator->pivot->status === 'completado';
-                        })->count();
-                        $allCompleted = ($arbitratorsCount > 0 && $completedCount === $arbitratorsCount);
-                        $pendingCount = $arbitratorsCount - $completedCount;
+                        });
+                        $anyArbitratorsAssigned = $submission->arbitrators->isNotEmpty();
                     @endphp
-                    
-                    <form action="{{ route('editor.progress.approve', $submission) }}" method="POST">
-                        @csrf
-                        <button type="submit" 
-                            @if(!$allCompleted) disabled @endif
-                            class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-black bg-blue-200 hover:bg-blue-300">
-                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Aceptar Solicitud
-                        </button>
-                    </form>
-                    
-                    @if(!$allCompleted && $arbitratorsCount > 0)
-                        <div class="mt-2 bg-yellow-50 border border-yellow-100 rounded-md p-3">
+
+                    @if(!$allArbitratorsCompleted)
+                        <div class="p-3 bg-yellow-50 border-l-4 border-yellow-400">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 15a1 1 0 110-2 1 1 0 010 2zm0-3a1 1 0 01-1-1V7a1 1 0 112 0v4a1 1 0 01-1 1z" clip-rule="evenodd" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-sm text-yellow-700">
-                                        Faltan <span class="font-medium">{{ $pendingCount }}</span> de {{ $arbitratorsCount }} árbitros por completar su evaluación.
+                                        @if(!$anyArbitratorsAssigned)
+                                            No se han asignado árbitros. Para aceptar la solicitud, primero asigne árbitros y espere sus evaluaciones.
+                                        @else
+                                            Faltan {{ $submission->arbitrators->where('pivot.status', '!=', 'completado')->count() }} de {{ $submission->arbitrators->count() }} árbitros por completar su evaluación. El botón de Aceptar Solicitud está deshabilitado.
+                                        @endif
                                     </p>
                                 </div>
                             </div>
                         </div>
                     @endif
-                    
-                    <form action="{{ route('editor.progress.reject', $submission) }}" method="POST">
+
+                    <div>
+                        <label for="decision_reason" class="block text-sm font-medium text-gray-700">Motivo de la Decisión (Opcional)</label>
+                        <textarea name="reason" id="decision_reason" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" {{ !$allArbitratorsCompleted ? 'disabled' : '' }}></textarea>
+                    </div>
+
+                    <form action="{{ route('editor.progress.reject', $submission) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas rechazar esta solicitud?');" class="actions-form">
                         @csrf
-                        <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        @method('PUT')
+                        <input type="hidden" name="reason" class="reason_input_hidden">
+                        <button type="submit" class="mt-2 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
                             <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                             Rechazar Solicitud
                         </button>
                     </form>
+
+                    <form action="{{ route('editor.progress.approve', $submission) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas aprobar esta solicitud?');" class="actions-form">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="reason" class="reason_input_hidden">
+                        <button type="submit" class="mt-2 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 {{ !$allArbitratorsCompleted ? 'opacity-50 cursor-not-allowed' : '' }}" {{ !$allArbitratorsCompleted ? 'disabled' : '' }}>
+                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Aceptar Solicitud
+                        </button>
+                    </form>
                 @endif
                 
-                @if($submission->manuscript_path)
-                    <a href="{{ asset('storage/' . $submission->manuscript_path) }}" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Ver Manuscrito (Word)
-                    </a>
+                @if($submission->reason)
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <h3 class="text-sm font-medium text-gray-500">Motivo de la decisión:</h3>
+                    <p class="mt-1 text-sm text-gray-900">{{ $submission->reason }}</p>
+                </div>
                 @endif
             </div>
         </div>
@@ -620,6 +628,29 @@
             const arbitratorId = window.location.hash.replace('#arbitro-', '');
             // Use parseInt to convert the string to a number
             goToArbitratorReviews(parseInt(arbitratorId));
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const reasonTextarea = document.getElementById('decision_reason');
+        const forms = document.querySelectorAll('.actions-form');
+
+        forms.forEach(form => {
+            form.addEventListener('submit', function () {
+                const hiddenInput = form.querySelector('.reason_input_hidden');
+                if (hiddenInput) {
+                    hiddenInput.value = reasonTextarea.value;
+                    hiddenInput.name = 'reason'; // Ensure the name is set to 'reason' for the backend
+                }
+            });
+        });
+
+        // Disable textarea if accept button is disabled
+        const approveButton = document.querySelector('form[action*="approve"] button[type="submit"]');
+        if (approveButton && approveButton.disabled) {
+            reasonTextarea.disabled = true;
+        } else {
+            reasonTextarea.disabled = false;
         }
     });
 </script>

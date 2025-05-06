@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Editor;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\SubmissionRequest;
 use App\Models\SubmissionReview;
+use Illuminate\Http\Request;
 
 class ProgressTrackingController extends Controller
 {
@@ -61,7 +61,7 @@ class ProgressTrackingController extends Controller
     /**
      * Aprueba una solicitud después de verificar que todos los árbitros han completado sus evaluaciones.
      */
-    public function approveSubmission(SubmissionRequest $submission)
+    public function approveSubmission(Request $request, SubmissionRequest $submission)
     {
         // Cargar las relaciones de árbitros
         $submission->load('arbitrators');
@@ -89,6 +89,7 @@ class ProgressTrackingController extends Controller
 
         // Si todos los árbitros han completado sus evaluaciones, aprobar la solicitud
         $submission->status = 'aprobado';
+        $submission->reason = $request->input('reason');
         $submission->save();
 
         return redirect()->back()->with('success', 'La solicitud ha sido aprobada exitosamente.');
@@ -97,10 +98,11 @@ class ProgressTrackingController extends Controller
     /**
      * Rechaza una solicitud de publicación.
      */
-    public function rejectSubmission(SubmissionRequest $submission)
+    public function rejectSubmission(Request $request, SubmissionRequest $submission)
     {
         // Cambiar el estado de la solicitud a rechazado
         $submission->status = 'rechazado';
+        $submission->reason = $request->input('reason');
         $submission->save();
 
         return redirect()->back()->with('success', 'La solicitud ha sido rechazada.');
