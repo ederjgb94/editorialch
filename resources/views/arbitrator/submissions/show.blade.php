@@ -173,89 +173,79 @@
                     </form>
                 </div>
             </div>
-            
-            <!-- Historial de revisiones -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                    <h2 class="text-lg font-medium text-gray-900">Mis Revisiones Anteriores</h2>
-                    @if(isset($previousReviews) && $previousReviews->count() > 0)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {{ $previousReviews->count() }} Revisiones
-                        </span>
-                    @endif
+        </div>
+    </div>
+
+    <!-- Historial de revisiones - MOVED HERE TO BE FULL WIDTH -->
+    <div class="mt-6 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-900">Mis Revisiones Anteriores</h2>
+            @if(isset($previousReviews) && $previousReviews->count() > 0)
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {{ $previousReviews->count() }} {{ $previousReviews->count() == 1 ? 'Revisión' : 'Revisiones' }}
+                </span>
+            @endif
+        </div>
+        <div class="p-0 sm:p-4"> {{-- Adjusted padding for better table display on small screens --}}
+            @if(isset($previousReviews) && $previousReviews->count() > 0)
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Fecha
+                                </th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Comentarios
+                                </th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Documento
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($previousReviews->sortBy([['created_at', 'desc'], ['id', 'desc']]) as $review)
+                                <tr>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $review->created_at->format('d/m/Y H:i') }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700">
+                                        @if($review->comments)
+                                            <p class="whitespace-pre-line">{{ $review->comments }}</p>
+                                        @else
+                                            <span class="text-gray-400 italic">Sin comentarios</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        @if($review->document_path)
+                                            <a href="{{ asset('storage/' . $review->document_path) }}"
+                                               target="_blank"
+                                               class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                </svg>
+                                                Descargar
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400 italic">No adjunto</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                <div class="p-4">
-                    @if(isset($previousReviews) && $previousReviews->count() > 0)
-                        <div class="flow-root">
-                            <ul class="-mb-8">
-                                @foreach($previousReviews as $index => $review)
-                                    <li>
-                                        <div class="relative pb-8">
-                                            @if($index !== $previousReviews->count() - 1)
-                                                <span class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                            @endif
-                                            <div class="relative flex items-start space-x-3">
-                                                <div>
-                                                    <div class="relative px-1">
-                                                        <div class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center ring-8 ring-white">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-blue-600">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="min-w-0 flex-1 py-1.5">
-                                                    <div class="text-sm text-gray-500">
-                                                        <span class="font-medium text-gray-900">Revisión realizada</span>
-                                                        <span class="ml-2 text-gray-500">
-                                                            {{ $review->created_at->format('d/m/Y H:i') }}
-                                                        </span>
-                                                    </div>
-                                                    
-                                                    <div class="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-4">
-                                                        @if($review->comments)
-                                                            <div>
-                                                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Comentarios:</h4>
-                                                                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                                                                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ $review->comments }}</p>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                        
-                                                        @if($review->document_path)
-                                                            <div>
-                                                                <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Documento adjunto:</h4>
-                                                                <a href="{{ asset('storage/' . $review->document_path) }}" 
-                                                                    target="_blank"
-                                                                    class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2 text-blue-600">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                                                                    </svg>
-                                                                    Descargar Documento
-                                                                </a>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @else
-                        <div class="text-center py-6">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">Aún no has realizado revisiones</h3>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Comienza agregando una nueva revisión con tus observaciones o un documento.
-                            </p>
-                        </div>
-                    @endif
+            @else
+                <div class="text-center py-6 px-4">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Aún no has realizado revisiones</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Comienza agregando una nueva revisión con tus observaciones o un documento.
+                    </p>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>
