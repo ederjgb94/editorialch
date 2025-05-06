@@ -73,7 +73,7 @@ use Illuminate\Support\Facades\Auth;
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     @php
                                         $arbitrator = $submission->arbitrators->where('id', Auth::id())->first();
-                                        $assignedDate = $arbitrator && isset($arbitrator->pivot) && $arbitrator->pivot->created_at ? $arbitrator->pivot->created_at->format('d/m/Y') : 'N/A';
+                                        $assignedDate = $arbitrator && isset($arbitrator->pivot) && $arbitrator->pivot->created_at ? $arbitrator->pivot->created_at->format('d/m/Y H:i:s') : 'N/A';
                                     @endphp
                                     {{ $assignedDate }}
                                 </td>
