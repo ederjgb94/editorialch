@@ -72,8 +72,8 @@ Route::middleware(['auth', 'role:asociado-editor'])->prefix('editor')->name('edi
     // Rutas para seguimiento de actualizaciones
     Route::get('/progress', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'index'])->name('progress.index');
     Route::get('/progress/{submission}', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'show'])->name('progress.show');
-    Route::post('/progress/{submission}/approve', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'approveSubmission'])->name('progress.approve');
-    Route::post('/progress/{submission}/reject', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'rejectSubmission'])->name('progress.reject');
+    Route::put('/progress/{submission}/approve', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'approveSubmission'])->name('progress.approve');
+    Route::put('/progress/{submission}/reject', [\App\Http\Controllers\Editor\ProgressTrackingController::class, 'rejectSubmission'])->name('progress.reject');
 });
 
 // Ruta principal redirige al dashboard
