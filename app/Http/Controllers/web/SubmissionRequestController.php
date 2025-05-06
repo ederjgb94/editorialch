@@ -49,6 +49,9 @@ class SubmissionRequestController extends Controller
     public function show(SubmissionRequest $submission)
     {
         $this->authorize('view', $submission);
+        $submission->load(['reviews' => function ($query) {
+            $query->with('arbitrator')->orderBy('created_at', 'desc');
+        }]);
         return view('submissions.show', compact('submission'));
     }
 
