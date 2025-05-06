@@ -39,7 +39,7 @@ class SubmissionRequestController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'manuscript_path' => $manuscriptPath,
-            'status' => 'pending'
+            'status' => 'pendiente'
         ]);
 
         return redirect()->route('submissions.show', $submission)

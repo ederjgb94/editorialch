@@ -30,9 +30,9 @@
                             <dt class="text-sm font-medium text-gray-500">Estado</dt>
                             <dd class="mt-1">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {{ $submission->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                    {{ $submission->status === 'approved' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $submission->status === 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
+                                    {{ $submission->status === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                    {{ $submission->status === 'aprobado' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $submission->status === 'rechazado' ? 'bg-red-100 text-red-800' : '' }}">
                                     {{ ucfirst($submission->status) }}
                                 </span>
                             </dd>
@@ -68,7 +68,7 @@
                     </dl>
                 </div>
 
-                @if($submission->status === 'pending')
+                @if($submission->status === 'pendiente')
                     <div class="flex justify-end">
                         <form action="{{ route('submissions.destroy', $submission) }}" 
                               method="POST" 

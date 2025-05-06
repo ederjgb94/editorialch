@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('pendiente');
             $table->string('manuscript_path')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();

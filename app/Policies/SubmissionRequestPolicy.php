@@ -17,6 +17,6 @@ class SubmissionRequestPolicy
 
     public function delete(User $user, SubmissionRequest $submission)
     {
-        return $user->id === $submission->user_id && $submission->status === 'pending';
+        return $user->id === $submission->user_id && $submission->status === 'pendiente';
     }
 }

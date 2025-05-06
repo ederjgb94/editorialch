@@ -173,7 +173,7 @@
                             </thead>
                             <tbody class="bg-white">
                                 <tr>
-                                    <td colspan="6" class="px-6 py-8 text-center">
+                                    <td colspan="5" class="px-6 py-8 text-center">
                                         <p class="text-sm font-medium text-gray-500">No hay solicitudes pendientes actualmente.</p>
                                     </td>
                                 </tr>
@@ -209,11 +209,6 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             {{ $submission->created_at->format('d/m/Y \a \l\a\s H:i') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                Pendiente
-                                            </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                             <a href="{{ route('editor.submissions.assign', $submission) }}" class="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-white hover:bg-blue-50">
