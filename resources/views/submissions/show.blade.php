@@ -28,19 +28,95 @@
 
                         <div>
                             <dt class="text-sm font-medium text-gray-500">Estado</dt>
-                            <dd class="mt-1">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            <dd class="mt-1" x-data="{ openStatusReasonModal: false }">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                     {{ $submission->status === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : '' }}
                                     {{ $submission->status === 'aprobado' ? 'bg-green-100 text-green-800' : '' }}
                                     {{ $submission->status === 'rechazado' ? 'bg-red-100 text-red-800' : '' }}">
                                     {{ ucfirst($submission->status) }}
                                 </span>
+                                @if (($submission->status === 'aprobado' || $submission->status === 'rechazado') && $submission->reason)
+                                    <button @click="openStatusReasonModal = true" class="ml-2 text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                        Ver descripción del estado
+                                    </button>
+
+                                    <!-- Status Reason Modal -->
+                                    <div x-show="openStatusReasonModal"
+                                         x-transition:enter="ease-out duration-300"
+                                         x-transition:enter-start="opacity-0"
+                                         x-transition:enter-end="opacity-100"
+                                         x-transition:leave="ease-in duration-200"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center"
+                                         style="display: none;" {{-- Initially hidden, Alpine controls visibility --}}>
+                                        <div @click.away="openStatusReasonModal = false" class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+                                        
+                                        <div class="bg-white rounded-lg shadow-xl p-6 m-4 max-w-2xl w-full relative z-10 max-h-[80vh] overflow-y-auto">
+                                            <div class="flex justify-between items-center pb-3 border-b">
+                                                <h3 class="text-lg font-medium text-gray-900">Descripción del Estado</h3>
+                                                <button @click="openStatusReasonModal = false" class="text-gray-400 hover:text-gray-600">
+                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div class="mt-4">
+                                                <p class="text-sm text-gray-700 whitespace-pre-line">{{ $submission->reason }}</p>
+                                            </div>
+                                            <div class="mt-6 flex justify-end">
+                                                <button @click="openStatusReasonModal = false" type="button" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </dd>
                         </div>
 
-                        <div class="sm:col-span-2">
+                        <div x-data="{ openDescriptionModal: false }" class="sm:col-span-2">
                             <dt class="text-sm font-medium text-gray-500">Descripción</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $submission->description }}</dd>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                <p class="truncate">{{ $submission->description }}</p>
+                                @if(strlen($submission->description) > 100) {{-- Adjust 100 to your preferred truncate length --}}
+                                    <button @click="openDescriptionModal = true" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+                                        Ver descripción completa
+                                    </button>
+                                @endif
+                            </dd>
+
+                            <!-- Description Modal -->
+                            <div x-show="openDescriptionModal" 
+                                 x-transition:enter="ease-out duration-300"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 x-transition:leave="ease-in duration-200"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0"
+                                 class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center"
+                                 style="display: none;" {{-- Initially hidden, Alpine controls visibility --}}>
+                                <div @click.away="openDescriptionModal = false" class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+                                
+                                <div class="bg-white rounded-lg shadow-xl p-6 m-4 max-w-2xl w-full relative z-10 max-h-[80vh] overflow-y-auto">
+                                    <div class="flex justify-between items-center pb-3 border-b">
+                                        <h3 class="text-lg font-medium text-gray-900">Descripción Completa</h3>
+                                        <button @click="openDescriptionModal = false" class="text-gray-400 hover:text-gray-600">
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="mt-4">
+                                        <p class="text-sm text-gray-700 whitespace-pre-line">{{ $submission->description }}</p>
+                                    </div>
+                                    <div class="mt-6 flex justify-end">
+                                        <button @click="openDescriptionModal = false" type="button" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                            Cerrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div>
