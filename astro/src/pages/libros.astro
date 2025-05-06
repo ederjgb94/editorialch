@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Pagination from "../components/book/Pagination.vue";
+import StaticPagination from "../components/book/StaticPagination.astro";
 ---
 
 <BaseLayout title="Libros">
@@ -21,40 +21,7 @@ import Pagination from "../components/book/Pagination.vue";
         </p>
     </div>
     <div class="max-w-5xl mx-auto px-10">
-        <Pagination client:load />
+        <StaticPagination />
     </div>
     <div class="h-10"></div>
 </BaseLayout>
-
-<script>
-    // Script para desplazarse al inicio de la página cuando cambia la paginación
-    document.addEventListener("DOMContentLoaded", function () {
-        // Verificar si la URL tiene un parámetro de página
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("page")) {
-            // Desplazarse al inicio de la página
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-            });
-        }
-
-        // Escuchar cambios en la URL (cuando cambian los parámetros)
-        let lastUrl = location.href;
-        new MutationObserver(() => {
-            const url = location.href;
-            if (url !== lastUrl) {
-                lastUrl = url;
-                // Comprobar si los parámetros han cambiado
-                const newParams = new URLSearchParams(location.search);
-                if (newParams.has("page")) {
-                    // Desplazarse al inicio de la página
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth",
-                    });
-                }
-            }
-        }).observe(document, { subtree: true, childList: true });
-    });
-</script>

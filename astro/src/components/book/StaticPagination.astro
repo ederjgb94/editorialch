@@ -1,0 +1,538 @@
+---
+// No props needed for static version
+const apiBaseUrl =
+    import.meta.env.PUBLIC_API_URL || "http://localhost:8000/api/v1";
+---
+
+<div id="books-container">
+    <!-- Búsqueda de libros -->
+    <div class="max-w-3xl mx-auto mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-1">
+            <form class="flex flex-col sm:flex-row" id="searchForm">
+                <div class="flex-grow relative">
+                    <div
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            ></path>
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        id="searchQuery"
+                        class="block w-full pl-10 pr-3 py-3 border-0 text-gray-900 placeholder-gray-500 focus:ring-0 focus:outline-none sm:text-sm"
+                        placeholder="Buscar libros, autores, temas..."
+                    />
+                </div>
+                <div class="mt-2 sm:mt-0 sm:ml-2">
+                    <select
+                        id="searchCategory"
+                        class="block w-full sm:w-auto py-3 px-4 border-0 bg-gray-50 text-gray-500 focus:ring-0 focus:outline-none sm:text-sm rounded-md"
+                    >
+                        <option value="title">Nombre</option>
+                        <option value="partner">Autores</option>
+                        <option value="publication_date">Año</option>
+                    </select>
+                </div>
+                <div class="mt-2 sm:mt-0 sm:ml-2">
+                    <button
+                        type="submit"
+                        class="w-full sm:w-auto flex justify-center py-3 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-700 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        Buscar
+                    </button>
+                </div>
+            </form>
+            <div
+                class="px-3 py-2 border-t border-gray-100 text-xs text-gray-500 flex justify-between"
+            >
+                <div>
+                    <span class="font-medium">Búsqueda Avanzada</span> • <span
+                        >Operadores Booleanos</span
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div
+        id="error-container"
+        class="w-full max-w-3xl mx-auto mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden"
+    >
+        <div class="flex items-center">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+            </svg>
+            <div>
+                <p class="font-bold">Error</p>
+                <p id="error-message"></p>
+            </div>
+            <button
+                id="retry-button"
+                class="ml-auto bg-red-200 hover:bg-red-300 text-red-800 px-4 py-2 rounded-lg"
+            >
+                Reintentar
+            </button>
+        </div>
+    </div>
+
+    <!-- Indicador de carga -->
+    <div id="loading-indicator" class="w-full hidden">
+        <div class="flex items-center justify-center py-12">
+            <div
+                class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-principal mb-4"
+            >
+            </div>
+            <p class="text-gray-600">Cargando libros...</p>
+        </div>
+    </div>
+
+    <!-- Listado de libros -->
+    <div
+        id="books-list"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+    >
+    </div>
+
+    <!-- Mensaje cuando no hay libros -->
+    <div id="no-books-message" class="text-center py-12 hidden">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 mx-auto text-gray-400 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            ></path>
+        </svg>
+        <p class="text-xl font-semibold text-gray-600">
+            No se encontraron libros
+        </p>
+        <p class="text-gray-500 mt-2">Prueba con otros términos de búsqueda</p>
+    </div>
+
+    <!-- Paginación -->
+    <div
+        id="pagination-controls"
+        class="flex justify-center items-center gap-4 mt-8 hidden"
+    >
+        <button
+            id="prev-page-button"
+            class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            Anterior
+        </button>
+
+        <span id="pagination-info" class="text-sm text-gray-600">
+            Página <span id="current-page">1</span> de <span id="total-pages"
+                >1</span
+            >
+        </span>
+
+        <button
+            id="next-page-button"
+            class="bg-principal text-white px-4 py-2 rounded hover:bg-principal/80 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            Siguiente
+        </button>
+    </div>
+</div>
+
+<script define:vars={{ apiBaseUrl }}>
+    // Variables globales
+    let currentPage = 1;
+    let totalPages = 1;
+    let books = [];
+    let searchQuery = "";
+    let searchCategory = "title";
+    let isLoading = false;
+    let errorMessage = null;
+    let loadTimeout = null;
+    const timeoutDuration = 10000; // 10 segundos
+
+    // Colores para las portadas aleatorias
+    const coverColors = [
+        { bg: "#E53E3E", grad: "#C53030" }, // Rojo
+        { bg: "#38A169", grad: "#2F855A" }, // Verde
+        { bg: "#3182CE", grad: "#2B6CB0" }, // Azul
+        { bg: "#805AD5", grad: "#6B46C1" }, // Púrpura
+        { bg: "#D69E2E", grad: "#B7791F" }, // Amarillo
+        { bg: "#DD6B20", grad: "#C05621" }, // Naranja
+        { bg: "#0D9488", grad: "#0F766E" }, // Turquesa
+        { bg: "#6366F1", grad: "#4F46E5" }, // Índigo
+        { bg: "#F59E0B", grad: "#D97706" }, // Ámbar
+        { bg: "#10B981", grad: "#059669" }, // Esmeralda
+    ];
+
+    // IDs de libros con imágenes fallidas
+    const failedImages = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Referencias a elementos del DOM
+        const searchForm = document.getElementById("searchForm");
+        const searchQueryInput = document.getElementById("searchQuery");
+        const searchCategorySelect = document.getElementById("searchCategory");
+        const errorContainer = document.getElementById("error-container");
+        const errorMessageElement = document.getElementById("error-message");
+        const retryButton = document.getElementById("retry-button");
+        const loadingIndicator = document.getElementById("loading-indicator");
+        const booksList = document.getElementById("books-list");
+        const noBooksMessage = document.getElementById("no-books-message");
+        const paginationControls = document.getElementById(
+            "pagination-controls",
+        );
+        const prevPageButton = document.getElementById("prev-page-button");
+        const nextPageButton = document.getElementById("next-page-button");
+        const currentPageElement = document.getElementById("current-page");
+        const totalPagesElement = document.getElementById("total-pages");
+
+        // Inicializar con datos de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageParam = urlParams.get("page");
+        const titleParam = urlParams.get("title");
+        const partnerParam = urlParams.get("partner");
+        const dateParam = urlParams.get("publication_date");
+
+        // Configurar los valores de búsqueda basados en los parámetros URL
+        if (titleParam && searchQueryInput && searchCategorySelect) {
+            searchQuery = titleParam;
+            searchCategory = "title";
+            searchQueryInput.value = titleParam;
+            searchCategorySelect.value = "title";
+        } else if (partnerParam && searchQueryInput && searchCategorySelect) {
+            searchQuery = partnerParam;
+            searchCategory = "partner";
+            searchQueryInput.value = partnerParam;
+            searchCategorySelect.value = "partner";
+        } else if (dateParam && searchQueryInput && searchCategorySelect) {
+            searchQuery = dateParam;
+            searchCategory = "publication_date";
+            searchQueryInput.value = dateParam;
+            searchCategorySelect.value = "publication_date";
+        }
+
+        // Event listeners
+        if (searchForm) {
+            searchForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                if (searchQueryInput && searchCategorySelect) {
+                    searchQuery = searchQueryInput.value;
+                    searchCategory = searchCategorySelect.value;
+                    fetchBooks(1);
+                }
+            });
+        }
+
+        if (retryButton) {
+            retryButton.addEventListener("click", () => {
+                fetchBooks(currentPage);
+            });
+        }
+
+        if (prevPageButton) {
+            prevPageButton.addEventListener("click", () => {
+                if (currentPage > 1) {
+                    fetchBooks(currentPage - 1);
+                }
+            });
+        }
+
+        if (nextPageButton) {
+            nextPageButton.addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    fetchBooks(currentPage + 1);
+                }
+            });
+        }
+
+        // Cargar los libros iniciales
+        fetchBooks(pageParam ? parseInt(pageParam) : 1);
+
+        // Funciones
+        function fetchBooks(page) {
+            try {
+                // Resetear error y mostrar indicador de carga
+                errorMessage = null;
+                if (errorContainer) errorContainer.classList.add("hidden");
+                isLoading = true;
+                if (loadingIndicator)
+                    loadingIndicator.classList.remove("hidden");
+                if (booksList) booksList.classList.add("hidden");
+                if (noBooksMessage) noBooksMessage.classList.add("hidden");
+                if (paginationControls)
+                    paginationControls.classList.add("hidden");
+
+                // Configurar timeout para detectar demoras largas
+                if (loadTimeout) {
+                    clearTimeout(loadTimeout);
+                }
+
+                loadTimeout = window.setTimeout(() => {
+                    if (isLoading) {
+                        showError(
+                            "La carga está tardando más de lo esperado. Por favor, intente nuevamente.",
+                        );
+                    }
+                }, timeoutDuration);
+
+                // Construir URL de la API
+                let endpoint;
+                const params = new URLSearchParams();
+                params.append("page", page.toString());
+
+                if (searchQuery && searchQuery.trim() !== "") {
+                    endpoint = `${apiBaseUrl}/books/search`;
+                    params.append(searchCategory, searchQuery);
+                    console.log(
+                        `Buscando con parámetro ${searchCategory}=${searchQuery}`,
+                    );
+                } else {
+                    endpoint = `${apiBaseUrl}/books`;
+                    console.log("Cargando todos los libros");
+                }
+
+                const apiUrl = `${endpoint}?${params.toString()}`;
+                console.log(`API URL: ${apiUrl}`);
+
+                // Actualizar la URL del navegador
+                const browserUrl = new URL(window.location.href);
+                browserUrl.searchParams.set("page", page.toString());
+
+                if (searchQuery && searchQuery.trim() !== "") {
+                    browserUrl.searchParams.delete("title");
+                    browserUrl.searchParams.delete("partner");
+                    browserUrl.searchParams.delete("publication_date");
+                    browserUrl.searchParams.set(searchCategory, searchQuery);
+                } else {
+                    browserUrl.searchParams.delete("title");
+                    browserUrl.searchParams.delete("partner");
+                    browserUrl.searchParams.delete("publication_date");
+                }
+
+                window.history.pushState({}, "", browserUrl.toString());
+
+                // Realizar la petición a la API
+                fetch(apiUrl)
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error(
+                                `Error de API: ${response.status} ${response.statusText}`,
+                            );
+                        }
+                        return response.json();
+                    })
+                    .then((result) => {
+                        console.log("Respuesta de la API:", result);
+
+                        // Limpiar el timeout
+                        if (loadTimeout) {
+                            clearTimeout(loadTimeout);
+                            loadTimeout = null;
+                        }
+
+                        // Actualizar datos
+                        books = result.data;
+                        totalPages = result.last_page;
+                        currentPage = result.current_page;
+
+                        // Actualizar UI
+                        updateUI();
+
+                        // Desplazarse al inicio
+                        window.scrollTo({
+                            top: 0,
+                            behavior: "smooth",
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error al cargar los libros:", error);
+                        showError(
+                            `Error al cargar los libros: ${error.message}`,
+                        );
+                        books = [];
+                        updateUI();
+                    })
+                    .finally(() => {
+                        isLoading = false;
+                        if (loadingIndicator)
+                            loadingIndicator.classList.add("hidden");
+
+                        // Limpiar timeout si existe
+                        if (loadTimeout) {
+                            clearTimeout(loadTimeout);
+                            loadTimeout = null;
+                        }
+                    });
+            } catch (error) {
+                console.error("Error en la función fetchBooks:", error);
+                showError(
+                    `Error inesperado: ${error instanceof Error ? error.message : String(error)}`,
+                );
+                isLoading = false;
+                if (loadingIndicator) loadingIndicator.classList.add("hidden");
+            }
+        }
+
+        function updateUI() {
+            // Actualizar la lista de libros
+            if (!booksList) return;
+
+            booksList.innerHTML = "";
+
+            if (books.length > 0) {
+                books.forEach((book) => {
+                    const bookElement = createBookElement(book);
+                    if (booksList) booksList.appendChild(bookElement);
+                });
+
+                if (booksList) booksList.classList.remove("hidden");
+                if (noBooksMessage) noBooksMessage.classList.add("hidden");
+
+                // Actualizar la paginación
+                if (currentPageElement) {
+                    currentPageElement.textContent = currentPage.toString();
+                }
+                if (totalPagesElement) {
+                    totalPagesElement.textContent = totalPages.toString();
+                }
+                if (paginationControls)
+                    paginationControls.classList.remove("hidden");
+
+                // Habilitar/deshabilitar botones de paginación
+                if (prevPageButton) prevPageButton.disabled = currentPage <= 1;
+                if (nextPageButton)
+                    nextPageButton.disabled = currentPage >= totalPages;
+            } else {
+                if (booksList) booksList.classList.add("hidden");
+                if (noBooksMessage) noBooksMessage.classList.remove("hidden");
+                if (paginationControls)
+                    paginationControls.classList.add("hidden");
+            }
+        }
+
+        function createBookElement(book) {
+            const bookDiv = document.createElement("div");
+            bookDiv.className =
+                "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full";
+
+            const imageContainer = document.createElement("div");
+            imageContainer.className = "flex-grow relative";
+            imageContainer.style.aspectRatio = "2/3";
+
+            if (book.cover && book.cover.trim() !== "") {
+                const img = document.createElement("img");
+                img.src = book.cover;
+                img.alt = `Portada de ${book.title}`;
+                img.className = "w-full h-full object-cover";
+
+                // Manejar error al cargar la imagen
+                img.addEventListener("error", function () {
+                    this.style.display = "none";
+                    if (book.id && !failedImages.includes(book.id)) {
+                        failedImages.push(book.id);
+                    }
+                    const colorCover = document.createElement("div");
+                    colorCover.className =
+                        "w-full h-full absolute top-0 left-0 flex items-center justify-center p-4 text-center";
+                    const color = getRandomBookCover(book.id || 0);
+                    colorCover.style.background = color.background;
+                    colorCover.style.boxShadow = color.boxShadow;
+
+                    const titleSpan = document.createElement("span");
+                    titleSpan.className =
+                        "text-white font-bold text-lg rotate-[-30deg]";
+                    titleSpan.textContent = book.title;
+
+                    colorCover.appendChild(titleSpan);
+                    imageContainer.appendChild(colorCover);
+                });
+
+                imageContainer.appendChild(img);
+            } else {
+                const colorCover = document.createElement("div");
+                colorCover.className =
+                    "w-full h-full flex items-center justify-center p-4 text-center";
+                const color = getRandomBookCover(book.id || 0);
+                colorCover.style.background = color.background;
+                colorCover.style.boxShadow = color.boxShadow;
+
+                const titleSpan = document.createElement("span");
+                titleSpan.className =
+                    "text-white font-bold text-lg rotate-[-30deg]";
+                titleSpan.textContent = book.title;
+
+                colorCover.appendChild(titleSpan);
+                imageContainer.appendChild(colorCover);
+            }
+
+            const contentDiv = document.createElement("div");
+            contentDiv.className = "p-4";
+
+            const title = document.createElement("h3");
+            title.className = "font-bold text-sm mb-2 text-gray-800";
+            title.textContent = book.title;
+
+            const actionDiv = document.createElement("div");
+            actionDiv.className = "flex justify-end";
+
+            const detailLink = document.createElement("a");
+            detailLink.href = `/book/${book.id}`;
+            detailLink.className =
+                "text-sm bg-principal hover:bg-principal/80 text-white px-3 py-1 rounded";
+            detailLink.textContent = "Ver detalles";
+
+            actionDiv.appendChild(detailLink);
+            contentDiv.appendChild(title);
+            contentDiv.appendChild(actionDiv);
+
+            bookDiv.appendChild(imageContainer);
+            bookDiv.appendChild(contentDiv);
+
+            return bookDiv;
+        }
+
+        function getRandomBookCover(bookId) {
+            const colorIndex = bookId % coverColors.length;
+            const color = coverColors[colorIndex];
+
+            return {
+                background: `linear-gradient(135deg, ${color.bg} 0%, ${color.grad} 100%)`,
+                boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.2)",
+            };
+        }
+
+        function showError(message) {
+            errorMessage = message;
+            if (errorMessageElement) errorMessageElement.textContent = message;
+            if (errorContainer) errorContainer.classList.remove("hidden");
+        }
+    });
+</script>
