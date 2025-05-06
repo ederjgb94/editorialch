@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\AstroController;
 
 // Rutas de autenticación
 Route::middleware('guest')->group(function () {
@@ -56,9 +57,19 @@ Route::middleware(['auth', 'role:asociado-editor'])->prefix('editor')->name('edi
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-// Ruta principal redirige al dashboard
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-});
+// Rutas Astro Frontend
+Route::get('/', [AstroController::class, 'handle'])->name('astro.home');
+Route::get('/libros', [AstroController::class, 'handle'])->name('astro.libros');
+Route::get('/book/{id}', [AstroController::class, 'handle'])->name('astro.book');
+Route::get('/contacto', [AstroController::class, 'handle'])->name('astro.contacto');
+
+// Catch-all route for Astro assets
+Route::get('assets/{path}', function ($path) {
+    return response()->file(public_path('astro/client/assets/' . $path));
+})->where('path', '.*');
+
+// Wildcard route for any Astro page not explicitly defined
+Route::get('{path}', [AstroController::class, 'handle'])
+    ->where('path', '^(?!api|admin|profile|dashboard|autor|arbitro|editor|login|register|assets).*$');
 
 require __DIR__ . '/auth.php';
