@@ -1,654 +1,637 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+// src/pages/book/[id].astro
+import Layout from "../../layouts/BaseLayout.astro";
 
-// API URL (using environment variable or default)
-const API_URL =
-    import.meta.env.PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
-// Esta función es necesaria para rutas estáticas en Astro
-// Como no podemos generar todas las rutas posibles, vamos a crear una ruta comodín
-// que luego se manejará con JavaScript del lado del cliente
-export function getStaticPaths() {
-    return [
-        { params: { id: "index" } }, // Página principal que cargará dinámicamente el libro según la URL
-    ];
+// Define an interface for the Book object based on available fields in the database
+interface Book {
+    id: string | number;
+    title: string;
+    isbn: string;
+    publication_date: string;
+    edition: string;
+    partner: string;
+    volume?: number;
+    pages?: number;
+    description?: string;
+    cover?: string;
+    pdf_path?: string;
 }
 
-// No cargaremos el libro aquí, lo cargaremos en el cliente mediante JavaScript
+export async function getStaticPaths() {
+    const apiBaseUrl =
+        import.meta.env.PUBLIC_API_URL || "http://localhost:8000/api/v1";
+    let allBooks: Book[] = []; // Explicitly type allBooks
+    let currentPage = 1;
+    let totalPages = 1;
+
+    try {
+        // Fetch the first page to get pagination details
+        const initialResponse = await fetch(
+            `${apiBaseUrl}/books?page=${currentPage}`,
+        );
+        if (!initialResponse.ok) {
+            console.error(
+                `API error (page ${currentPage}): ${initialResponse.status} ${initialResponse.statusText}`,
+            );
+            const errorText = await initialResponse.text();
+            console.error(`Error details: ${errorText}`);
+            return [];
+        }
+
+        const initialResult = await initialResponse.json();
+        if (initialResult.data && Array.isArray(initialResult.data)) {
+            allBooks = allBooks.concat(initialResult.data);
+        } else {
+            console.error(
+                "Initial fetched data is not in the expected format (missing data array).",
+            );
+            console.error("Received:", initialResult);
+            return [];
+        }
+
+        totalPages = initialResult.last_page || 1;
+
+        // Fetch remaining pages if any
+        for (currentPage = 2; currentPage <= totalPages; currentPage++) {
+            const response = await fetch(
+                `${apiBaseUrl}/books?page=${currentPage}`,
+            );
+            if (!response.ok) {
+                console.error(
+                    `API error (page ${currentPage}): ${response.status} ${response.statusText}`,
+                );
+                // Decide if you want to stop or continue if a page fails
+                continue; // Skipping this page on error
+            }
+            const result = await response.json();
+            if (result.data && Array.isArray(result.data)) {
+                allBooks = allBooks.concat(result.data);
+            } else {
+                console.warn(
+                    `Fetched data for page ${currentPage} is not in the expected format.`,
+                );
+            }
+        }
+
+        if (allBooks.length === 0) {
+            console.warn(
+                "No books found after fetching all pages. Check API or logic.",
+            );
+            return [];
+        }
+
+        return allBooks
+            .map((book) => {
+                if (book && typeof book.id !== "undefined") {
+                    return {
+                        params: { id: String(book.id) },
+                        props: { bookData: book },
+                    };
+                } else {
+                    console.warn("Book object is invalid or missing id:", book);
+                    return null; // Will be filtered out
+                }
+            })
+            .filter((path) => path !== null); // Filter out any null paths due to invalid book data
+    } catch (error) {
+        console.error("Failed to fetch books for static paths:", error);
+        return []; // Return empty array on error
+    }
+}
+
+const { bookData } = Astro.props as { bookData: Book }; // Add type assertion for Astro.props
+
+if (!bookData) {
+    // This can happen if getStaticPaths returned an empty array or there was an issue
+    // You might want to redirect to a 404 page or show an error message
+    return Astro.redirect("/404"); // Or handle differently
+}
 ---
 
-<BaseLayout title="Detalle del libro">
-    <main class="sciencedirect-layout pb-20">
-        <div class="sd-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 b-8">
-            <!-- Indicador de carga -->
-            <div
-                id="loading-indicator"
-                class="flex justify-center items-center h-64"
-            >
-                <div
-                    class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
-                >
+<Layout title={bookData.title || "Libro sin título"}>
+    <div class="container mx-auto py-4 px-4 md:px-8 max-w-screen-xl">
+        <!-- Eliminando la línea divisoria y los botones de acción superiores -->
+
+        <!-- Estructura principal de dos columnas -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Columna izquierda - Índice/Navegación -->
+            <div class="lg:w-1/4">
+                <div class="bg-white shadow-md rounded p-4 sticky top-4">
+                    <h2 class="text-lg font-semibold mb-4 border-b pb-2">
+                        Índice
+                    </h2>
+                    <ul class="space-y-2">
+                        <li>
+                            <a
+                                href="#detalles"
+                                class="text-blue-600 hover:underline"
+                                >Detalles del libro</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#descripcion"
+                                class="text-blue-600 hover:underline"
+                                >Descripción</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#descargas"
+                                class="text-blue-600 hover:underline"
+                                >Descargas</a
+                            >
+                        </li>
+                    </ul>
+
+                    {
+                        bookData.cover ? (
+                            <div class="mt-6">
+                                <img
+                                    src={bookData.cover}
+                                    alt={`Portada de ${bookData.title || "Libro"}`}
+                                    class="w-full h-auto object-cover object-center rounded"
+                                    onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+                                />
+                                <div class="hidden mt-0 bg-gray-200 rounded flex items-center justify-center h-60">
+                                    <span class="text-gray-500 text-sm">
+                                        Sin portada
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div class="mt-6 bg-gray-200 rounded flex items-center justify-center h-60">
+                                <span class="text-gray-500 text-sm">
+                                    Portada no disponible
+                                </span>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
 
-            <!-- Contenedor de error -->
-            <div
-                id="error-container"
-                class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-6"
-                role="alert"
-            >
-                <p class="font-bold">Error</p>
-                <p id="error-message"></p>
-                <p class="mt-2">No se pudo cargar el libro</p>
-            </div>
-
-            <!-- Contenedor del libro -->
-            <div id="book-container" class="hidden">
-                <div
-                    class="sd-two-column-wrapper flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-8"
-                >
-                    <!-- Left sidebar with TOC -->
-                    <aside class="sd-toc-sidebar lg:w-1/4">
-                        <div
-                            class="sd-outline bg-white p-6 rounded-lg shadow-md sticky top-8"
-                        >
-                            <h3
-                                class="text-lg font-bold mb-4 pb-2 border-b border-gray-200"
-                            >
-                                Índice
-                            </h3>
-                            <ul class="space-y-2">
-                                <li>
-                                    <a
-                                        href="#section-info"
-                                        class="text-gray-700 hover:text-gray-900 flex items-center"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-4 mr-2"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            ></path>
-                                        </svg>
-                                        Información general
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#section-description"
-                                        class="text-gray-700 hover:text-gray-900 flex items-center"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-4 mr-2"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                            ></path>
-                                        </svg>
-                                        Descripción
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#section-pdf"
-                                        class="text-gray-700 hover:text-gray-900 flex items-center"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-4 mr-2"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2z"
-                                            ></path>
-                                        </svg>
-                                        Vista previa
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </aside>
-
-                    <!-- Right column with article and sidebar -->
-                    <div
-                        class="sd-content-wrapper lg:w-3/4 flex flex-col md:flex-row md:space-x-6"
-                    >
-                        <!-- Main content area -->
-                        <article
-                            class="sd-main-content bg-white rounded-lg shadow-md overflow-hidden md:w-2/3"
-                        >
-                            <header
-                                class="sd-article-header p-6 border-b border-gray-200"
-                            >
-                                <h1
-                                    id="book-title"
-                                    class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4"
-                                >
-                                    Cargando...
-                                </h1>
-                                <div
-                                    class="sd-authors text-sm text-gray-600 mb-2"
-                                >
-                                    Autor: <span id="book-author"
-                                        >Cargando...</span
-                                    >
-                                </div>
-                                <div
-                                    class="sd-publication-info text-sm grid grid-cols-1 sm:grid-cols-2 gap-2"
-                                    id="book-metadata"
-                                >
-                                    <!-- Se llenará dinámicamente desde JavaScript -->
-                                </div>
-                            </header>
-
-                            <section
-                                id="section-description"
-                                class="sd-abstract p-6 border-b border-gray-200"
-                            >
-                                <h2
-                                    class="text-xl font-bold mb-4 text-gray-800"
-                                >
-                                    Descripción
-                                </h2>
-                                <div class="prose max-w-none">
-                                    <p id="book-description">
-                                        Cargando descripción...
-                                    </p>
-                                </div>
-                            </section>
-
-                            <section
-                                id="section-pdf"
-                                class="sd-article-body p-6"
-                            >
-                                <h2
-                                    class="text-xl font-bold mb-4 text-gray-800"
-                                >
-                                    Vista previa
-                                </h2>
-                                <div
-                                    id="pdf-container"
-                                    class="border rounded-lg overflow-hidden h-[600px] bg-gray-100"
-                                >
-                                    <!-- Se llenará dinámicamente desde JavaScript -->
-                                </div>
-                            </section>
-                        </article>
-
-                        <!-- Sidebar with metadata and tools -->
-                        <aside class="sd-sidebar mt-6 md:mt-0 md:w-1/3">
-                            <!-- Contenedor de la portada del libro -->
-                            <div
-                                class="sd-cover-image bg-white p-6 rounded-lg shadow-md"
-                            >
-                                <div
-                                    class="cover-container mb-6"
-                                    id="book-cover-container"
-                                >
-                                    <!-- Se llenará dinámicamente desde JavaScript -->
-                                </div>
-
-                                <!-- Sección de información general separada claramente de la portada -->
-                                <div id="section-info" class="space-y-4">
-                                    <h3
-                                        class="font-bold text-lg border-t border-gray-200 pt-6"
-                                    >
-                                        Información general
-                                    </h3>
-                                    <ul
-                                        class="space-y-2 text-sm"
-                                        id="book-details"
-                                    >
-                                        <!-- Se llenará dinámicamente desde JavaScript -->
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div
-                                class="sd-actions mt-6 bg-white p-6 rounded-lg shadow-md"
-                                id="book-actions"
-                            >
-                                <!-- Se llenará dinámicamente desde JavaScript -->
-                            </div>
-                        </aside>
+            <!-- Columna derecha - Contenido principal -->
+            <div class="lg:w-3/4">
+                <div class="">
+                    <div class="text-2xl font-bold text-blue-800 mb-2">
+                        ScAsEd
                     </div>
+                    <h1 class="text-3xl font-bold mb-4 text-gray-800">
+                        {bookData.title || "Título no disponible"}
+                    </h1>
+                    <!-- <div class="text-sm text-gray-600 mb-5">
+                        {
+                            bookData.volume ? (
+                                <span>Volumen {bookData.volume}, </span>
+                            ) : (
+                                <span>Volumen no especificado, </span>
+                            )
+                        }
+                        {
+                            bookData.edition ? (
+                                <span>Edición {bookData.edition}, </span>
+                            ) : (
+                                <span>Edición no especificada, </span>
+                            )
+                        }
+                        {
+                            bookData.publication_date
+                                ? new Date(
+                                      bookData.publication_date,
+                                  ).getFullYear()
+                                : "Año no disponible"
+                        }
+                        {
+                            bookData.pages ? (
+                                <span>, Páginas no especificadas</span>
+                            ) : (
+                                <span>, Páginas no especificadas</span>
+                            )
+                        }
+                    </div> -->
+                </div>
+
+                <!-- Autores/Colaboradores - Añadiendo superíndice numérico -->
+                <div class="mb-5">
+                    <!-- <h3 class="font-semibold text-lg mb-2">Colaboradores</h3> -->
+                    {
+                        bookData.partner && bookData.partner.trim() !== "" ? (
+                            <div class="flex flex-wrap gap-2">
+                                {bookData.partner
+                                    .split(",")
+                                    .map((author: string, index: number) => (
+                                        <div class="bg-gray-100 px-3 py-1 rounded-full text-sm flex items-center">
+                                            <span>{author.trim()}</span>
+                                            <sup class="ml-1 text-xs font-medium">
+                                                {index + 1}
+                                            </sup>
+                                        </div>
+                                    ))}
+                            </div>
+                        ) : (
+                            <p class="text-gray-500 italic">
+                                Sin colaboradores registrados
+                            </p>
+                        )
+                    }
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex flex-wrap gap-3 mb-8">
+                    <!-- <button
+                        class="flex items-center text-sm bg-gray-100 border border-gray-300 px-3 py-1 rounded"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                            ></path>
+                        </svg>
+                        Guardar
+                    </button> -->
+                    <button
+                        class="flex items-center text-sm bg-gray-100 border border-gray-300 px-3 py-1 rounded"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                            ></path>
+                        </svg>
+                        Compartir
+                    </button>
+                    {
+                        bookData.pdf_path ? (
+                            <a
+                                href={bookData.pdf_path}
+                                class="flex items-center text-sm bg-gray-100 border border-gray-300 px-3 py-1 rounded"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                    />
+                                </svg>
+                                PDF
+                            </a>
+                        ) : (
+                            <button
+                                disabled
+                                class="flex items-center text-sm bg-gray-100 border border-gray-300 px-3 py-1 rounded opacity-50 cursor-not-allowed"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-4 w-4 mr-1"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                    />
+                                </svg>
+                                PDF
+                            </button>
+                        )
+                    }
+                </div>
+
+                <!-- Enlaces de cita y DOI -->
+                <!-- <div class="mb-8">
+                    <div class="text-sm text-gray-600 mb-2">
+                        <a href="#" class="text-blue-600 hover:underline"
+                            >https://editorialchavira.mx/libro/{bookData.id}</a
+                        >
+                    </div>
+                    <div class="text-sm">
+                        <strong>ISBN:</strong>
+                        {bookData.isbn || "ISBN no registrado"}
+                    </div>
+                </div> -->
+
+                <!-- Línea divisoria -->
+                <!-- <hr class="my-8 border-gray-300" /> -->
+
+                <!-- Detalles del libro - Ahora con más énfasis en colaboradores -->
+                <section id="detalles" class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4">
+                        Informacion del libro
+                    </h2>
+
+                    <div class="bg-gray-50 p-4 rounded">
+                        <table class="w-full">
+                            <tbody>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >Título:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.title ||
+                                                "Título no disponible"
+                                        }</td
+                                    >
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >ISBN:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.isbn ||
+                                                "ISBN no registrado"
+                                        }</td
+                                    >
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >Fecha de publicación:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.publication_date
+                                                ? new Date(
+                                                      bookData.publication_date,
+                                                  ).toLocaleDateString()
+                                                : "Fecha no disponible"
+                                        }</td
+                                    >
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >Edición:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.edition ||
+                                                "Sin información de edición"
+                                        }</td
+                                    >
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >Volumen:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.volume ||
+                                                "Volumen no especificado"
+                                        }</td
+                                    >
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >Páginas:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.pages ||
+                                                "Número de páginas no especificado"
+                                        }</td
+                                    >
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 font-semibold"
+                                        >Colaboradores:</td
+                                    >
+                                    <td
+                                        >{
+                                            bookData.partner &&
+                                            bookData.partner.trim() !== ""
+                                                ? bookData.partner
+                                                : "Sin colaboradores registrados"
+                                        }</td
+                                    >
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Descripción - Siempre mostrar el apartado -->
+                <section id="descripcion" class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4">Descripción</h2>
+                    <div
+                        class="prose max-w-none text-gray-700 bg-gray-50 p-4 rounded"
+                    >
+                        {
+                            bookData.description &&
+                            bookData.description.trim() !== "" ? (
+                                <p>{bookData.description}</p>
+                            ) : (
+                                <p class="text-gray-500 italic">
+                                    Sin descripción disponible para este libro
+                                </p>
+                            )
+                        }
+                    </div>
+                </section>
+
+                <!-- Sección de descargas con visor de PDF embebido -->
+                <section id="descargas" class="mb-8">
+                    <h2 class="text-2xl font-bold mb-4">Vista previa</h2>
+                    {
+                        bookData.pdf_path ? (
+                            <div class="flex flex-col space-y-4">
+                                <div class="bg-gray-50 rounded border border-gray-200">
+                                    {/* <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                                        <h3 class="font-semibold">
+                                            Vista previa del documento
+                                        </h3>
+                                        <a
+                                            href={bookData.pdf_path}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-4 w-4 mr-1"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                                />
+                                            </svg>
+                                            Descargar PDF completo
+                                        </a>
+                                    </div> */}
+                                    <div
+                                        class="relative"
+                                        style="height: 500px;"
+                                    >
+                                        <object
+                                            data={bookData.pdf_path}
+                                            type="application/pdf"
+                                            width="100%"
+                                            height="100%"
+                                            class="absolute inset-0"
+                                            onerror="this.style.display='none'; document.getElementById('pdf-error').classList.remove('hidden');"
+                                        >
+                                            <p>
+                                                Tu navegador no puede mostrar
+                                                PDFs.{" "}
+                                                <a href={bookData.pdf_path}>
+                                                    Descargar PDF
+                                                </a>{" "}
+                                                en su lugar.
+                                            </p>
+                                        </object>
+                                        <div
+                                            id="pdf-error"
+                                            class="hidden absolute inset-0 flex items-center justify-center bg-gray-100"
+                                        >
+                                            <div class="text-center p-4">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-12 w-12 mx-auto text-gray-400 mb-4"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                                    />
+                                                </svg>
+                                                <h3 class="text-lg font-medium mb-2">
+                                                    No se pudo cargar el PDF
+                                                </h3>
+                                                <p class="text-gray-600 mb-4">
+                                                    El archivo PDF no está
+                                                    disponible o el enlace está
+                                                    roto.
+                                                </p>
+                                                <a
+                                                    href={bookData.pdf_path}
+                                                    class="text-blue-600 hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    Intentar descargar
+                                                    directamente
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600">
+                                    Esta es una vista previa del documento.
+                                    Puedes descargar el PDF completo usando el
+                                    botón superior.
+                                </p>
+                            </div>
+                        ) : (
+                            <div class="bg-gray-50 p-6 rounded border border-gray-200 text-center">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="h-12 w-12 mx-auto text-gray-400 mb-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.5"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                    />
+                                </svg>
+                                <h3 class="text-lg font-medium mb-2">
+                                    Vista previa no disponible
+                                </h3>
+                                <p class="text-gray-600">
+                                    Este libro no tiene una versión PDF
+                                    disponible para visualización o descarga.
+                                </p>
+                                <p class="text-gray-600 mt-2">
+                                    Contacta con la editorial para más
+                                    información sobre disponibilidad.
+                                </p>
+                            </div>
+                        )
+                    }
+                </section>
+
+                <!-- Botón de regreso -->
+                <div class="mt-10 mb-6">
+                    <a
+                        href="/libros"
+                        class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 mr-1"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Volver al catálogo
+                    </a>
                 </div>
             </div>
         </div>
-    </main>
-</BaseLayout>
+    </div>
+</Layout>
 
 <style>
-    /* ScienceDirect-inspired styles */
-    .sd-container {
-        max-width: 1400px;
-        margin: 0 auto;
+    /* Estilos específicos para emular ScienceDirect */
+    .prose p {
+        margin-bottom: 1em;
     }
 
-    .cover-error {
-        background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
-        aspect-ratio: 2/3;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 0.25rem;
+    /* Añadir estilos para hacer que los títulos de sección se parezcan a ScienceDirect */
+    h2 {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
     }
 
-    .cover-error::after {
-        content: attr(data-title);
-        color: white;
-        font-weight: bold;
-        transform: rotate(-30deg);
-        text-align: center;
-        padding: 1rem;
+    /* Estilo para los enlaces */
+    a.text-blue-600 {
+        text-decoration: none;
     }
 
-    @media (max-width: 768px) {
-        .sd-two-column-wrapper {
-            flex-direction: column;
-        }
-
-        .sd-toc-sidebar,
-        .sd-content-wrapper {
-            width: 100%;
-        }
+    a.text-blue-600:hover {
+        text-decoration: underline;
     }
 </style>
-
-<script define:vars={{ API_URL }}>
-    // Colores para las portadas aleatorias
-    const coverColors = [
-        { bg: "#E53E3E", grad: "#C53030" }, // Rojo
-        { bg: "#38A169", grad: "#2F855A" }, // Verde
-        { bg: "#3182CE", grad: "#2B6CB0" }, // Azul
-        { bg: "#805AD5", grad: "#6B46C1" }, // Púrpura
-        { bg: "#D69E2E", grad: "#B7791F" }, // Amarillo
-        { bg: "#DD6B20", grad: "#C05621" }, // Naranja
-        { bg: "#0D9488", grad: "#0F766E" }, // Turquesa
-        { bg: "#6366F1", grad: "#4F46E5" }, // Índigo
-        { bg: "#F59E0B", grad: "#D97706" }, // Ámbar
-        { bg: "#10B981", grad: "#059669" }, // Esmeralda
-    ];
-
-    document.addEventListener("DOMContentLoaded", () => {
-        // Elementos del DOM
-        const loadingIndicator = document.getElementById("loading-indicator");
-        const errorContainer = document.getElementById("error-container");
-        const errorMessage = document.getElementById("error-message");
-        const bookContainer = document.getElementById("book-container");
-
-        // Obtener el ID del libro de la URL
-        const path = window.location.pathname;
-        const bookId = path.split("/").pop(); // Esto obtiene el último segmento de la URL
-
-        if (bookId && !isNaN(bookId)) {
-            fetchBookDetails(bookId);
-        } else {
-            showError("ID de libro no válido");
-        }
-
-        // Función para obtener detalles del libro
-        function fetchBookDetails(id) {
-            // Mostrar indicador de carga y ocultar otros contenedores
-            if (loadingIndicator) loadingIndicator.classList.remove("hidden");
-            if (errorContainer) errorContainer.classList.add("hidden");
-            if (bookContainer) bookContainer.classList.add("hidden");
-
-            fetch(`${API_URL}/books/${id}`)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(
-                            `Error en la respuesta del API: ${response.status}`,
-                        );
-                    }
-                    return response.json();
-                })
-                .then((book) => {
-                    renderBookDetails(book);
-                })
-                .catch((error) => {
-                    console.error(
-                        "Error al cargar los detalles del libro:",
-                        error,
-                    );
-                    showError(error.message);
-                })
-                .finally(() => {
-                    if (loadingIndicator)
-                        loadingIndicator.classList.add("hidden");
-                });
-        }
-
-        // Función para mostrar error
-        function showError(message) {
-            if (errorContainer) errorContainer.classList.remove("hidden");
-            if (errorMessage) errorMessage.textContent = message;
-            if (loadingIndicator) loadingIndicator.classList.add("hidden");
-            if (bookContainer) bookContainer.classList.add("hidden");
-
-            // Actualizar el título de la página
-            document.title = "Error - Libro no encontrado";
-        }
-
-        // Función para renderizar detalles del libro
-        function renderBookDetails(book) {
-            // Actualizar título de la página
-            document.title = book.title;
-
-            // Título y autor del libro
-            document.getElementById("book-title").textContent =
-                book.title || "Sin título";
-            document.getElementById("book-author").textContent =
-                book.partner || "No disponible";
-
-            // Descripción
-            document.getElementById("book-description").textContent =
-                book.description ||
-                "No hay descripción disponible para este libro.";
-
-            // Metadatos del libro
-            renderMetadata(book);
-
-            // Portada del libro
-            renderCover(book);
-
-            // Detalles adicionales
-            renderDetails(book);
-
-            // Acciones (botones)
-            renderActions(book);
-
-            // PDF
-            renderPDF(book);
-
-            // Mostrar el contenedor del libro
-            if (bookContainer) bookContainer.classList.remove("hidden");
-        }
-
-        // Función para renderizar metadatos
-        function renderMetadata(book) {
-            const metadataContainer = document.getElementById("book-metadata");
-            if (!metadataContainer) return;
-
-            metadataContainer.innerHTML = "";
-
-            if (book.publication_date) {
-                const dateSpan = document.createElement("span");
-                dateSpan.className = "flex items-center";
-                dateSpan.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Publicación: ${new Date(book.publication_date).toLocaleDateString()}
-                `;
-                metadataContainer.appendChild(dateSpan);
-            }
-
-            if (book.isbn) {
-                const isbnSpan = document.createElement("span");
-                isbnSpan.className = "flex items-center";
-                isbnSpan.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    ISBN: ${book.isbn}
-                `;
-                metadataContainer.appendChild(isbnSpan);
-            }
-
-            if (book.edition) {
-                const editionSpan = document.createElement("span");
-                editionSpan.className = "flex items-center";
-                editionSpan.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                    Edición: ${book.edition}
-                `;
-                metadataContainer.appendChild(editionSpan);
-            }
-
-            if (book.pages) {
-                const pagesSpan = document.createElement("span");
-                pagesSpan.className = "flex items-center";
-                pagesSpan.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    Páginas: ${book.pages}
-                `;
-                metadataContainer.appendChild(pagesSpan);
-            }
-        }
-
-        // Función para renderizar portada
-        function renderCover(book) {
-            const coverContainer = document.getElementById(
-                "book-cover-container",
-            );
-            if (!coverContainer) return;
-
-            coverContainer.innerHTML = "";
-
-            if (book.cover) {
-                const img = document.createElement("img");
-                img.src = book.cover;
-                img.alt = `Portada de ${book.title}`;
-                img.className =
-                    "w-full shadow-md border border-gray-200 rounded";
-                img.onerror = function () {
-                    this.style.display = "none";
-                    coverContainer.classList.add("cover-error");
-
-                    // Crear portada de fallback con color aleatorio
-                    const colorIndex = book.id % coverColors.length;
-                    const color = coverColors[colorIndex];
-
-                    const fallback = document.createElement("div");
-                    fallback.className =
-                        "aspect-[2/3] rounded flex items-center justify-center p-4";
-                    fallback.style.background = `linear-gradient(135deg, ${color.bg} 0%, ${color.grad} 100%)`;
-
-                    const titleSpan = document.createElement("span");
-                    titleSpan.className =
-                        "text-white font-bold text-lg rotate-[-30deg] text-center";
-                    titleSpan.textContent = book.title;
-
-                    fallback.appendChild(titleSpan);
-                    coverContainer.appendChild(fallback);
-                };
-                coverContainer.appendChild(img);
-            } else {
-                // Crear portada con color aleatorio
-                const colorIndex = book.id % coverColors.length;
-                const color = coverColors[colorIndex];
-
-                const fallback = document.createElement("div");
-                fallback.className =
-                    "aspect-[2/3] rounded flex items-center justify-center p-4";
-                fallback.style.background = `linear-gradient(135deg, ${color.bg} 0%, ${color.grad} 100%)`;
-
-                const titleSpan = document.createElement("span");
-                titleSpan.className =
-                    "text-white font-bold text-lg rotate-[-30deg] text-center";
-                titleSpan.textContent = book.title;
-
-                fallback.appendChild(titleSpan);
-                coverContainer.appendChild(fallback);
-            }
-        }
-
-        // Función para renderizar detalles adicionales
-        function renderDetails(book) {
-            const detailsContainer = document.getElementById("book-details");
-            if (!detailsContainer) return;
-
-            detailsContainer.innerHTML = "";
-
-            // Autor
-            if (book.partner) {
-                const item = document.createElement("li");
-                item.className = "flex items-start";
-                item.innerHTML = `
-                    <span class="font-medium w-24">Autor:</span>
-                    <span>${book.partner}</span>
-                `;
-                detailsContainer.appendChild(item);
-            }
-
-            // Fecha de publicación
-            if (book.publication_date) {
-                const item = document.createElement("li");
-                item.className = "flex items-start";
-                item.innerHTML = `
-                    <span class="font-medium w-24">Publicado:</span>
-                    <span>${new Date(book.publication_date).toLocaleDateString()}</span>
-                `;
-                detailsContainer.appendChild(item);
-            }
-
-            // ISBN
-            if (book.isbn) {
-                const item = document.createElement("li");
-                item.className = "flex items-start";
-                item.innerHTML = `
-                    <span class="font-medium w-24">ISBN:</span>
-                    <span>${book.isbn}</span>
-                `;
-                detailsContainer.appendChild(item);
-            }
-
-            // Edición
-            if (book.edition) {
-                const item = document.createElement("li");
-                item.className = "flex items-start";
-                item.innerHTML = `
-                    <span class="font-medium w-24">Edición:</span>
-                    <span>${book.edition}</span>
-                `;
-                detailsContainer.appendChild(item);
-            }
-
-            // Volumen
-            if (book.volume) {
-                const item = document.createElement("li");
-                item.className = "flex items-start";
-                item.innerHTML = `
-                    <span class="font-medium w-24">Volumen:</span>
-                    <span>${book.volume}</span>
-                `;
-                detailsContainer.appendChild(item);
-            }
-
-            // Páginas
-            if (book.pages) {
-                const item = document.createElement("li");
-                item.className = "flex items-start";
-                item.innerHTML = `
-                    <span class="font-medium w-24">Páginas:</span>
-                    <span>${book.pages}</span>
-                `;
-                detailsContainer.appendChild(item);
-            }
-        }
-
-        // Función para renderizar acciones (botones)
-        function renderActions(book) {
-            const actionsContainer = document.getElementById("book-actions");
-            if (!actionsContainer) return;
-
-            actionsContainer.innerHTML = "";
-
-            // Botón de descarga PDF
-            if (book.pdf_path) {
-                const pdfLink = document.createElement("a");
-                pdfLink.href = `${API_URL}/books/${book.id}/pdf`;
-                pdfLink.target = "_blank";
-                pdfLink.className =
-                    "sd-btn sd-btn-primary w-full flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none mb-2";
-                pdfLink.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Descargar PDF
-                `;
-                actionsContainer.appendChild(pdfLink);
-            }
-
-            // Botón de copiar enlace
-            const copyButton = document.createElement("button");
-            copyButton.className =
-                "sd-btn w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none mb-2";
-            copyButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copiar enlace
-            `;
-            copyButton.addEventListener("click", () => {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Enlace copiado al portapapeles");
-            });
-            actionsContainer.appendChild(copyButton);
-
-            // Botón de compartir en Twitter
-            const twitterLink = document.createElement("a");
-            twitterLink.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Descubre "${book.title}" en el catálogo de Editorial ScAsEd`)}&url=${encodeURIComponent(window.location.toString())}`;
-            twitterLink.target = "_blank";
-            twitterLink.className =
-                "sd-btn w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none";
-            twitterLink.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-                Compartir
-            `;
-            actionsContainer.appendChild(twitterLink);
-        }
-
-        // Función para renderizar PDF
-        function renderPDF(book) {
-            const pdfContainer = document.getElementById("pdf-container");
-            if (!pdfContainer) return;
-
-            pdfContainer.innerHTML = "";
-
-            if (book.pdf_path) {
-                const iframe = document.createElement("iframe");
-                iframe.src = `${API_URL}/books/${book.id}/pdf?embed=true`;
-                iframe.width = "100%";
-                iframe.height = "100%";
-                iframe.style.border = "none";
-                iframe.title = `Vista previa de ${book.title}`;
-                pdfContainer.appendChild(iframe);
-            } else {
-                pdfContainer.innerHTML = `
-                    <div class="flex items-center justify-center h-[300px] bg-gray-100 rounded-lg border">
-                        <p class="text-gray-500 italic">
-                            No hay vista previa disponible para este libro
-                        </p>
-                    </div>
-                `;
-            }
-        }
-    });
-</script>

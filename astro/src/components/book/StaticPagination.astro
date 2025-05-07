@@ -504,7 +504,7 @@ const apiBaseUrl =
             actionDiv.className = "flex justify-end";
 
             const detailLink = document.createElement("a");
-            detailLink.href = `/book/${book.id}`;
+            detailLink.href = `/book/${book.id}`; // Changed this line
             detailLink.className =
                 "text-sm bg-principal hover:bg-principal/80 text-white px-3 py-1 rounded";
             detailLink.textContent = "Ver detalles";
