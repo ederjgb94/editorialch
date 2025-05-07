@@ -55,46 +55,6 @@ class BookController extends Controller
     /**
      * Search for books and return matching results first, followed by non-matching results
      */
-    // public function search(Request $request)
-    // {
-    //     $search = $request->get('title') ?? $request->get('partner') ?? $request->get('publication_date');
-    //     $searchField = null;
-
-    //     if ($request->has('title')) {
-    //         $searchField = 'title';
-    //     } elseif ($request->has('partner')) {
-    //         $searchField = 'partner';
-    //     } elseif ($request->has('publication_date')) {
-    //         $searchField = 'publication_date';
-    //     }
-
-    //     if (empty($search)) {
-    //         return response()->json(Book::orderBy('publication_date', 'desc')->paginate(10));
-    //     }
-
-    //     // Dividimos la búsqueda en palabras clave
-    //     $keywords = explode(' ', $search);
-
-    //     // Obtenemos los libros que coinciden con alguna de las palabras clave
-    //     $matchingBooks = Book::where(function ($query) use ($searchField, $keywords) {
-    //         foreach ($keywords as $keyword) {
-    //             $query->orWhere($searchField, 'LIKE', "%{$keyword}%");
-    //         }
-    //     });
-
-    //     // Obtenemos los libros que no coinciden con ninguna de las palabras clave
-    //     $otherBooks = Book::where(function ($query) use ($searchField, $keywords) {
-    //         foreach ($keywords as $keyword) {
-    //             $query->where($searchField, 'NOT LIKE', "%{$keyword}%");
-    //         }
-    //     })->orderBy('publication_date', 'desc');
-
-    //     // Unimos ambas consultas y paginamos
-    //     $books = $matchingBooks->union($otherBooks)->paginate(10);
-
-    //     return response()->json($books);
-    // }
-
     public function search(Request $request)
     {
         $search = $request->get('title') ?? $request->get('partner') ?? $request->get('publication_date');
@@ -108,7 +68,7 @@ class BookController extends Controller
             $searchField = 'publication_date';
         }
 
-        if (empty($search)) {
+        if (empty($search) || empty($searchField)) {
             return response()->json(Book::orderBy('publication_date', 'desc')->paginate(10));
         }
 
@@ -116,21 +76,29 @@ class BookController extends Controller
         $keywords = explode(' ', $search);
 
         // Obtenemos los libros que coinciden con alguna de las palabras clave
-        $matchingBooks = Book::where(function ($query) use ($searchField, $keywords) {
-            foreach ($keywords as $keyword) {
-                $query->orWhere($searchField, 'LIKE', "%{$keyword}%");
-            }
-        });
+        $matchingBooksQuery = Book::query()
+            ->where(function ($query) use ($searchField, $keywords) {
+                foreach ($keywords as $keyword) {
+                    $query->orWhere($searchField, 'LIKE', "%{$keyword}%");
+                }
+            })
+            ->selectRaw('books.*, 1 as relevance_score');
 
         // Obtenemos los libros que no coinciden con ninguna de las palabras clave
-        $otherBooks = Book::where(function ($query) use ($searchField, $keywords) {
-            foreach ($keywords as $keyword) {
-                $query->where($searchField, 'NOT LIKE', "%{$keyword}%");
-            }
-        })->orderBy('publication_date', 'desc');
+        $nonMatchingBooksQuery = Book::query()
+            ->where(function ($query) use ($searchField, $keywords) {
+                foreach ($keywords as $keyword) {
+                    $query->where($searchField, 'NOT LIKE', "%{$keyword}%");
+                }
+            })
+            ->selectRaw('books.*, 0 as relevance_score');
 
-        // Unimos ambas consultas y paginamos
-        $books = $matchingBooks->union($otherBooks)->paginate(10);
+        // Unimos ambas consultas, ordenamos y paginamos
+        $books = $matchingBooksQuery
+            ->union($nonMatchingBooksQuery)
+            ->orderBy('relevance_score', 'desc')
+            ->orderBy('publication_date', 'desc')
+            ->paginate(10);
 
         return response()->json($books);
     }
