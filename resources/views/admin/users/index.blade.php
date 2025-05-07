@@ -39,6 +39,7 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link Profile</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -48,7 +49,26 @@
                             <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $user->email }}</div>
+                            <div class="text-sm text-gray-900 relative">
+                                <div id="copy-message-{{ $user->id }}" class="hidden" style="
+                                    position: absolute;
+                                    top: -40px;
+                                    left: 0;
+                                    background-color: #003244;
+                                    color: white;
+                                    font-size: 14px;
+                                    padding: 8px 12px;
+                                    border-radius: 8px;
+                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    border: 1px solid #002233;
+                                    z-index: 1000;
+                                ">
+                                    Correo guardado en portapapeles
+                                </div>
+                                <button type="button" onclick="copyToClipboard('{{ $user->email }}', {{ $user->id }})" class="text-blue-600 hover:text-blue-900">
+                                    {{ $user->email }}
+                                </button>
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @foreach ($user->roles as $role)
@@ -69,6 +89,19 @@
                                 </button>
                             </form>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">
+                                @if ($user->link_profile)
+                                    <a href="{{ $user->link_profile }}" target="_blank" class="text-blue-600 hover:text-blue-900">
+                                        Abrir Perfil
+                                    </a>
+                                @else
+                                    <button type="button" onclick="alert('Sin Link de perfil')" class="text-gray-500 hover:text-gray-700">
+                                        N/A
+                                    </button>
+                                @endif
+                            </div>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -79,4 +112,53 @@
         {{ $users->links() }}
     </div>
 </div>
+
+<script>
+    function copyToClipboard(text, userId) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyMessage(userId);
+            }).catch(err => {
+                console.error('Error al copiar el correo:', err);
+                fallbackCopyToClipboard(text, userId);
+            });
+        } else {
+            fallbackCopyToClipboard(text, userId);
+        }
+    }
+
+    function fallbackCopyToClipboard(text, userId) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopyMessage(userId);
+            } else {
+                alert('No se pudo copiar el correo. Inténtalo manualmente.');
+            }
+        } catch (err) {
+            console.error('Error al copiar el correo:', err);
+            alert('No se pudo copiar el correo. Inténtalo manualmente.');
+        }
+
+        document.body.removeChild(textarea);
+    }
+
+    function showCopyMessage(userId) {
+        const messageDiv = document.getElementById(`copy-message-${userId}`);
+        if (messageDiv) {
+            messageDiv.classList.remove('hidden');
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 2000);
+        }
+    }
+</script>
 @endsection

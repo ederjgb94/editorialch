@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; // Ensure this import is present for other methods like updatePassword
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
@@ -18,23 +18,17 @@ class ProfileController extends Controller
         return view('profile.edit');
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . Auth::id()],
-        ]);
+        $user = $request->user(); // Get the authenticated user from the request
 
-        Auth::user()->fill([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+        $user->fill($request->validated()); // Fill the user model with validated data
 
-        if (Auth::user()->isDirty('email')) {
-            Auth::user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        Auth::user()->save();
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -46,11 +40,7 @@ class ProfileController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        if (!Hash::check($request->current_password, Auth::user()->password)) {
-            return back()->withErrors(['current_password' => 'La contraseña actual no es correcta.']);
-        }
-
-        Auth::user()->update([
+        $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
 

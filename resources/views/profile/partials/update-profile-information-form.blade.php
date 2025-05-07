@@ -43,6 +43,21 @@
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
+
+            <div>
+                <label for="link_profile" class="block text-sm font-medium leading-6 text-gray-900">
+                    Link Profile (Orcid, LinkedIn, etc.)
+                </label>
+                <div class="mt-2">
+                    <input type="url" name="link_profile" id="link_profile"
+                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#013243] sm:text-sm sm:leading-6"
+                        value="{{ old('link_profile', $user->link_profile) }}"
+                        autocomplete="url">
+                </div>
+                @error('link_profile')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <div class="mt-6 flex items-center justify-end gap-x-6 pt-6 border-t border-gray-200">

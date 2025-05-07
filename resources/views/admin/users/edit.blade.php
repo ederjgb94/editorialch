@@ -52,6 +52,16 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div>
+                    <label for="link_profile" class="block text-sm font-medium text-gray-700">Link Profile (Orcid, LinkedIn, etc.)</label>
+                    <input type="url" name="link_profile" id="link_profile"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#013243] focus:ring-[#013243]"
+                        value="{{ old('link_profile', $user->link_profile) }}">
+                    @error('link_profile')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div class="flex justify-end">
