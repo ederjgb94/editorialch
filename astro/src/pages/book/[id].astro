@@ -109,36 +109,38 @@ if (!bookData) {
 ---
 
 <Layout title={bookData.title || "Libro sin título"}>
-    <div class="container mx-auto py-4 px-4 md:px-8 max-w-screen-xl">
+    <div class="container mx-auto py-4 px-2 sm:px-4 md:px-8 max-w-screen-xl">
         <!-- Eliminando la línea divisoria y los botones de acción superiores -->
 
         <!-- Estructura principal de dos columnas -->
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row gap-4 md:gap-6">
             <!-- Columna izquierda - Índice/Navegación -->
-            <div class="lg:w-1/4">
-                <div class="bg-white shadow-md rounded p-4 sticky top-4">
-                    <h2 class="text-lg font-semibold mb-4 border-b pb-2">
+            <div class="lg:w-1/4 order-2 lg:order-1">
+                <div class="bg-white shadow-md rounded p-3 sm:p-4 sticky top-4">
+                    <h2
+                        class="text-lg font-semibold mb-3 sm:mb-4 border-b pb-2"
+                    >
                         Índice
                     </h2>
                     <ul class="space-y-2">
                         <li>
                             <a
                                 href="#detalles"
-                                class="text-blue-600 hover:underline"
+                                class="text-gray-600 hover:underline"
                                 >Detalles del libro</a
                             >
                         </li>
                         <li>
                             <a
                                 href="#descripcion"
-                                class="text-blue-600 hover:underline"
+                                class="text-gray-600 hover:underline"
                                 >Descripción</a
                             >
                         </li>
                         <li>
                             <a
                                 href="#descargas"
-                                class="text-blue-600 hover:underline"
+                                class="text-gray-600 hover:underline"
                                 >Descargas</a
                             >
                         </li>
@@ -171,7 +173,7 @@ if (!bookData) {
             </div>
 
             <!-- Columna derecha - Contenido principal -->
-            <div class="lg:w-3/4">
+            <div class="lg:w-3/4 order-1 lg:order-2">
                 <div class="">
                     <div class="text-2xl font-bold text-blue-800 mb-2">
                         ScAsEd
@@ -461,36 +463,9 @@ if (!bookData) {
                         bookData.pdf_path ? (
                             <div class="flex flex-col space-y-4">
                                 <div class="bg-gray-50 rounded border border-gray-200">
-                                    {/* <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                                        <h3 class="font-semibold">
-                                            Vista previa del documento
-                                        </h3>
-                                        <a
-                                            href={bookData.pdf_path}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="inline-flex items-center text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-4 w-4 mr-1"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                                />
-                                            </svg>
-                                            Descargar PDF completo
-                                        </a>
-                                    </div> */}
                                     <div
-                                        class="relative"
-                                        style="height: 500px;"
+                                        class="relative w-full"
+                                        style="height: 300px; min-height: 300px; max-height: 70vh;"
                                     >
                                         <object
                                             data={bookData.pdf_path}
@@ -549,11 +524,33 @@ if (!bookData) {
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-600">
-                                    Esta es una vista previa del documento.
-                                    Puedes descargar el PDF completo usando el
-                                    botón superior.
-                                </p>
+                                <div class="flex justify-between items-center flex-wrap gap-2">
+                                    <p class="text-sm text-gray-600">
+                                        Esta es una vista previa del documento.
+                                    </p>
+                                    <a
+                                        href={bookData.pdf_path}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="inline-flex items-center text-sm bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="h-4 w-4 mr-1.5"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                            />
+                                        </svg>
+                                        Descargar PDF completo
+                                    </a>
+                                </div>
                             </div>
                         ) : (
                             <div class="bg-gray-50 p-6 rounded border border-gray-200 text-center">
@@ -633,5 +630,45 @@ if (!bookData) {
 
     a.text-blue-600:hover {
         text-decoration: underline;
+    }
+
+    /* Estilos responsivos adicionales */
+    @media (max-width: 640px) {
+        .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        .sticky {
+            position: relative;
+            top: 0;
+        }
+    }
+
+    /* Estilos para el visor de PDF en dispositivos pequeños */
+    @media (max-width: 480px) {
+        [style*="height: 300px"] {
+            height: 250px !important;
+        }
+    }
+
+    /* Mejoras para la tabla en dispositivos pequeños */
+    @media (max-width: 480px) {
+        table {
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
     }
 </style>
