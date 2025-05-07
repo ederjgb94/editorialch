@@ -20,7 +20,7 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $user = $request->user(); // Get the authenticated user from the request
+        $user = Auth::user(); // Use Auth facade to get the authenticated user
 
         $user->fill($request->validated()); // Fill the user model with validated data
 
