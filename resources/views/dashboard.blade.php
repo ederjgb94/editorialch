@@ -60,6 +60,43 @@
                     </div>
                     @endif
 
+                    <!-- Sección de Gestión de Usuarios -->
+                    @if(auth()->user()->hasRole('admin'))
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                                Gestión de Usuarios
+                            </h3>
+                            <div class="space-y-4">
+                                <a href="{{ route('admin.users.index') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Administrar Usuarios
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Ver, crear, editar y eliminar usuarios del sistema
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="{{ route('admin.users.create') }}" class="block p-4 border rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center">
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-900">
+                                                Nuevo Usuario
+                                            </p>
+                                            <p class="text-sm text-gray-500">
+                                                Agregar un nuevo usuario al sistema
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Sección de Solicitudes de Publicación -->
                     @if(auth()->user()->hasRole('asociado-autor'))
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

@@ -3,9 +3,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8 border-b border-gray-200 pb-6">
-        <a href="{{ route('admin.dashboard') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
-            ← Volver al Panel de Control
-        </a>
         <h1 class="font-serif text-4xl font-bold text-gray-900 mb-2">Gestión de Usuarios</h1>
         <p class="text-lg text-gray-600">Administra los usuarios y sus roles en el sistema</p>
     </div>
