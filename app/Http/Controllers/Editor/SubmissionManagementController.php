@@ -15,7 +15,7 @@ class SubmissionManagementController extends Controller
      */
     public function index()
     {
-        $submissions = SubmissionRequest::with('user')->latest()->get();
+        $submissions = SubmissionRequest::with('user')->latest()->paginate(10); // Changed get() to paginate(10)
         return view('editor.submissions.index', compact('submissions'));
     }
 

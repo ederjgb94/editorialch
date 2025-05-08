@@ -49,10 +49,8 @@ class SubmissionRequestController extends Controller
     public function show(SubmissionRequest $submission)
     {
         $this->authorize('view', $submission);
-        $submission->load(['reviews' => function ($query) {
-            $query->with('arbitrator')->orderBy('created_at', 'desc');
-        }]);
-        return view('submissions.show', compact('submission'));
+        $reviews = $submission->reviews()->with('arbitrator')->orderBy('created_at', 'desc')->paginate(10);
+        return view('submissions.show', compact('submission', 'reviews'));
     }
 
     public function destroy(SubmissionRequest $submission)

@@ -180,11 +180,11 @@
     <div class="mt-6 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
         <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
             <h2 class="text-lg font-medium text-gray-900">Mis Revisiones Anteriores</h2>
-            @if(isset($previousReviews) && $previousReviews->count() > 0)
+            {{-- @if(isset($previousReviews) && $previousReviews->count() > 0)
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {{ $previousReviews->count() }} {{ $previousReviews->count() == 1 ? 'Revisión' : 'Revisiones' }}
                 </span>
-            @endif
+            @endif --}}
         </div>
         <div class="p-0 sm:p-4"> {{-- Adjusted padding for better table display on small screens --}}
             @if(isset($previousReviews) && $previousReviews->count() > 0)
@@ -204,7 +204,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($previousReviews->sortBy([['created_at', 'desc'], ['id', 'desc']]) as $review)
+                            @foreach($previousReviews as $review) {{-- Removed sortBy as pagination handles order --}}
                                 <tr>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $review->created_at->format('d/m/Y H:i') }}
@@ -234,6 +234,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-4 px-4 sm:px-0"> {{-- Added padding for pagination links --}}
+                    {{ $previousReviews->links() }}
                 </div>
             @else
                 <div class="text-center py-6 px-4">

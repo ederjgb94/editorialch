@@ -45,7 +45,7 @@ class SubmissionController extends Controller
         $previousReviews = SubmissionReview::where('submission_request_id', $submission->id)
             ->where('user_id', $user->id)
             ->latest()
-            ->get();
+            ->paginate(10); // Cambiado de get() a paginate(10)
 
         return view('arbitrator.submissions.show', compact('submission', 'previousReviews'));
     }

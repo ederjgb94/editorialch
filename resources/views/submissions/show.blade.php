@@ -145,39 +145,65 @@
                 </div>
 
                 {{-- Historial de Revisiones --}}
-                @if ($submission->reviews && $submission->reviews->count() > 0)
+                @if ($reviews && $reviews->count() > 0)
                     <div class="mt-8">
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">Historial de Revisiones</h3>
-                        <div class="space-y-6">
-                            @foreach ($submission->reviews as $review)
-                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <p class="text-sm font-medium text-gray-700">
-                                            Revisado por: <span class="font-semibold">{{ $review->arbitrator->name }}</span>
-                                        </p>
-                                        <p class="text-xs text-gray-500">{{ $review->created_at->format('d/m/Y H:i') }}</p>
-                                    </div>
-                                    @if ($review->comments)
-                                        <div class="mb-2">
-                                            <p class="text-sm text-gray-600">Comentarios:</p>
-                                            <p class="text-sm text-gray-800 whitespace-pre-line">{{ $review->comments }}</p>
-                                        </div>
-                                    @endif
-                                    @if ($review->document_path)
-                                        <div>
-                                            <a href="{{ Storage::url($review->document_path) }}"
-                                               target="_blank"
-                                               class="text-sm text-indigo-600 hover:text-indigo-900 flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                </svg>
-                                                Descargar Documento de Revisión (Word)
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Revisado por
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Fecha
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Comentarios
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Documento de Revisión
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach ($reviews as $review)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {{ $review->arbitrator->name }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {{ $review->created_at->format('d/m/Y H:i') }}
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-pre-line">
+                                                {{ $review->comments ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                @if ($review->document_path)
+                                                    <a href="{{ Storage::url($review->document_path) }}"
+                                                       target="_blank"
+                                                       class="text-indigo-600 hover:text-indigo-900 flex items-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                        </svg>
+                                                        Descargar
+                                                    </a>
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
+                        <div class="mt-4">
+                            {{ $reviews->links() }}
+                        </div>
+                    </div>
+                @else
+                    <div class="mt-8">
+                        <p class="text-gray-600">No hay revisiones para esta solicitud aún.</p>
                     </div>
                 @endif
 
