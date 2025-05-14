@@ -192,7 +192,7 @@
 
                     <div>
                         <label for="decision_reason" class="block text-sm font-medium text-gray-700">Motivo de la Decisión (Opcional)</label>
-                        <textarea name="reason" id="decision_reason" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" {{ !$allArbitratorsCompleted ? 'disabled' : '' }}></textarea>
+                        <textarea name="reason" id="decision_reason" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
                     </div>
 
                     <form action="{{ route('editor.progress.reject', $submission) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas rechazar esta solicitud?');" class="actions-form">
@@ -635,24 +635,20 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const reasonTextarea = document.getElementById('decision_reason');
-        const forms = document.querySelectorAll('.actions-form');
+        
+        if (reasonTextarea) {
+            reasonTextarea.disabled = false; // Ensure the textarea is enabled
 
-        forms.forEach(form => {
-            form.addEventListener('submit', function () {
-                const hiddenInput = form.querySelector('.reason_input_hidden');
-                if (hiddenInput) {
-                    hiddenInput.value = reasonTextarea.value;
-                    hiddenInput.name = 'reason'; // Ensure the name is set to 'reason' for the backend
-                }
+            const forms = document.querySelectorAll('.actions-form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function () {
+                    const hiddenInput = form.querySelector('.reason_input_hidden');
+                    if (hiddenInput && reasonTextarea) { 
+                        hiddenInput.value = reasonTextarea.value;
+                        hiddenInput.name = 'reason'; 
+                    }
+                });
             });
-        });
-
-        // Disable textarea if accept button is disabled
-        const approveButton = document.querySelector('form[action*="approve"] button[type="submit"]');
-        if (approveButton && approveButton.disabled) {
-            reasonTextarea.disabled = true;
-        } else {
-            reasonTextarea.disabled = false;
         }
     });
 </script>
