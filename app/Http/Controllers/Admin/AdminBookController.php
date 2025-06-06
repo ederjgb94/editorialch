@@ -24,6 +24,7 @@ class AdminBookController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
+            'authors' => 'nullable|max:255',
             'isbn' => 'required|unique:books|max:20',
             'publication_date' => 'required|date',
             'edition' => 'required|max:50',
@@ -57,6 +58,7 @@ class AdminBookController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|max:255',
+            'authors' => 'nullable|max:255',
             'isbn' => 'required|max:20|unique:books,isbn,' . $book->id,
             'publication_date' => 'required|date',
             'edition' => 'required|max:50',

@@ -7,6 +7,11 @@
     </div>
 
     <div>
+        <label for="authors" class="block text-sm font-medium text-gray-700">Autores</label>
+        <input type="text" name="authors" id="authors" value="{{ old('authors', $book->authors ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ej: Juan Pérez, Ana Gómez">
+    </div>
+
+    <div>
         <label for="isbn" class="block text-sm font-medium text-gray-700">ISBN</label>
         <input type="text" name="isbn" id="isbn" value="{{ old('isbn', $book->isbn ?? '') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
     </div>

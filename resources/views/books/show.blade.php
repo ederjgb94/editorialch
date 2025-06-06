@@ -18,6 +18,12 @@
                     <div>
                         <h3 class="text-lg font-medium text-gray-900">Información General</h3>
                         <dl class="mt-2 space-y-3">
+                            @if($book->authors)
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Autores</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $book->authors }}</dd>
+                            </div>
+                            @endif
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">ISBN</dt>
                                 <dd class="mt-1 text-sm text-gray-900 font-mono">{{ $book->isbn }}</dd>

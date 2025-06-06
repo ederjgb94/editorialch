@@ -18,6 +18,13 @@
                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#013243] focus:border-[#013243] sm:text-sm">
                 </div>
 
+                <div>
+                    <label for="authors" class="block text-sm font-medium text-gray-700">Autores</label>
+                    <input type="text" name="authors" id="authors" 
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#013243] focus:border-[#013243] sm:text-sm"
+                           placeholder="Ej: Juan Pérez, Ana Gómez">
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="isbn" class="block text-sm font-medium text-gray-700">ISBN</label>
