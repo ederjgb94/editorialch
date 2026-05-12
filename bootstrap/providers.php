@@ -2,7 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\RouteServiceProvider::class,
     Illuminate\Auth\AuthServiceProvider::class,
     Illuminate\Cookie\CookieServiceProvider::class,
     Illuminate\Database\DatabaseServiceProvider::class,
