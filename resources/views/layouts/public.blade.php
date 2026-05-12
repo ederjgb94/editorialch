@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'Sagedi') | Sagan Editors</title>
-    <meta name="description" content="@yield('meta_description', 'Sagedi — Editorial de acceso abierto totalmente en línea. Sagan Editors (ISSN 2572-0619).')">
+    <meta name="description" content="@yield('meta_description', 'Sagedi — Editorial de acceso abierto totalmente en línea. Sagan Editors (ISBN 978-1-950752-05-8).')">
 
     <!-- Scripts y Estilos -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

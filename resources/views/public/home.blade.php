@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Sagedi — Sagan Editors')
-@section('meta_description', 'Editorial de acceso abierto totalmente en línea. Sagan Editors (ISSN 2572-0619).')
+@section('meta_description', 'Editorial de acceso abierto totalmente en línea. Sagan Editors (ISBN 978-1-950752-05-8).')
 
 @section('content')
 
@@ -23,7 +23,7 @@
                 </h1>
                 <p class="text-lg md:text-2xl text-blue-100 font-normal tracking-wide" style="font-family:'Source Sans 3',ui-sans-serif,sans-serif;">
                     Sagan Editors
-                    <span class="block text-xs md:text-sm font-light mt-2 text-blue-300/80 tracking-[0.3em] uppercase">(ISSN 2572-0619)</span>
+                    <span class="block text-xs md:text-sm font-light mt-2 text-blue-300/80 tracking-[0.3em] uppercase">(ISBN 978-1-950752-05-8)</span>
                 </p>
                 <div class="h-px w-24 bg-blue-500/40 mx-auto"></div>
             </div>
