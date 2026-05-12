@@ -1,6 +1,6 @@
-# Joulaar - Journal of Latin American Academic Research
+# Sagedi - Journal of Latin American Academic Research
 
-Joulaar es una editorial de acceso abierto totalmente en línea, desarrollada bajo los principios de la Iniciativa Budapest sobre Acceso Abierto. Esta plataforma está construida utilizando **Laravel** y **Blade**, consolidando todo el sistema (Frontend y Backend) en una arquitectura monolítica para máxima estabilidad y rendimiento.
+Sagedi es una editorial de acceso abierto totalmente en línea, desarrollada bajo los principios de la Iniciativa Budapest sobre Acceso Abierto. Esta plataforma está construida utilizando **Laravel** y **Blade**, consolidando todo el sistema (Frontend y Backend) en una arquitectura monolítica para máxima estabilidad y rendimiento.
 
 ## Características
 
@@ -30,4 +30,4 @@ Explora las distintas publicaciones, con sistema de carga asíncrona e *infinite
 - **Asset Pipeline:** Vite
 
 ---
-*© Joulaar - Todos los derechos reservados.*
+*© Sagedi - Todos los derechos reservados.*

@@ -4,8 +4,8 @@
         {{-- Logo --}}
         <div class="flex-shrink-0">
             <a href="{{ route('home') }}" class="flex items-center">
-                <img src="{{ asset('images/joulaar-logo.png') }}"
-                     alt="Joulaar Logo"
+                <img src="{{ asset('images/sagedi-logo.png') }}"
+                     alt="Sagedi Logo"
                      class="h-12 w-auto object-contain transition-transform hover:scale-105">
             </a>
         </div>

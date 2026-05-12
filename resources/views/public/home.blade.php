@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Joulaar — Journal of Latin American Academic Research')
+@section('title', 'Sagedi — Journal of Latin American Academic Research')
 @section('meta_description', 'Editorial de acceso abierto totalmente en línea. Journal of Latin American Academic Research (ISSN 2572-0619).')
 
 @section('content')
@@ -10,7 +10,7 @@
     {{-- Background Image --}}
     <div class="absolute inset-0 z-0">
         <img src="{{ asset('hero-banner.jpg') }}"
-             alt="Joulaar Hero"
+             alt="Sagedi Hero"
              class="w-full h-full object-cover opacity-50">
         <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-transparent to-slate-900"></div>
     </div>
@@ -19,7 +19,7 @@
         <div class="max-w-4xl mx-auto space-y-8 animate-fade-in">
             <div class="space-y-4">
                 <h1 class="text-5xl md:text-7xl font-normal text-white" style="font-family:'DM Serif Display','Georgia',serif;">
-                    Joulaar
+                    Sagedi
                 </h1>
                 <p class="text-lg md:text-2xl text-blue-100 font-normal tracking-wide" style="font-family:'Source Sans 3',ui-sans-serif,sans-serif;">
                     Journal of Latin American Academic Research
@@ -61,7 +61,7 @@
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div class="space-y-6">
                     <p class="text-gray-700 text-base md:text-lg leading-relaxed">
-                        En Joulaar nos dedicamos a facilitar la difusión del conocimiento académico y científico,
+                        En Sagedi nos dedicamos a facilitar la difusión del conocimiento académico y científico,
                         operando bajo los principios de la Iniciativa Budapest sobre Acceso Abierto.
                     </p>
                     <p class="text-gray-700 text-base md:text-lg leading-relaxed">

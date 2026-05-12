@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Catálogo de Libros')
-@section('meta_description', 'Explora el catálogo completo de publicaciones académicas de acceso abierto de Joulaar.')
+@section('meta_description', 'Explora el catálogo completo de publicaciones académicas de acceso abierto de Sagedi.')
 
 @section('content')
 

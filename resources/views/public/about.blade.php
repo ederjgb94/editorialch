@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Sobre Joulaar')
-@section('meta_description', 'Conoce la misión, historia y equipo editorial de Joulaar, revista de acceso abierto para la investigación latinoamericana.')
+@section('title', 'Sobre Sagedi')
+@section('meta_description', 'Conoce la misión, historia y equipo editorial de Sagedi, revista de acceso abierto para la investigación latinoamericana.')
 
 @section('content')
 <div class="container mx-auto px-4 py-12">
@@ -12,7 +12,7 @@
             <h2 class="text-2xl font-semibold mb-4">Nuestra Historia</h2>
             <p class="mb-4 text-gray-700 leading-relaxed">
                 Fundada con la visión de publicar obras académicas que inspiran, educan y transforman vidas,
-                Joulaar nació como un proyecto comprometido con la divulgación científica de calidad en América Latina.
+                Sagedi nació como un proyecto comprometido con la divulgación científica de calidad en América Latina.
             </p>
             <p class="text-gray-700 leading-relaxed">
                 A lo largo de los años, hemos crecido hasta convertirnos en una editorial reconocida por la calidad

@@ -5,8 +5,8 @@
             {{-- Brand & Description --}}
             <div class="lg:col-span-2">
                 <aside class="flex items-center gap-3 mb-6">
-                    <img src="{{ asset('images/joulaar-logo.png') }}" alt="Joulaar Logo" class="h-10 w-auto object-contain">
-                    <strong class="text-2xl font-bold text-slate-900 tracking-tight">Joulaar</strong>
+                    <img src="{{ asset('images/sagedi-logo.png') }}" alt="Sagedi Logo" class="h-10 w-auto object-contain">
+                    <strong class="text-2xl font-bold text-slate-900 tracking-tight">Sagedi</strong>
                 </aside>
                 <p class="text-slate-500 max-w-md leading-relaxed text-sm md:text-base">
                     Plataforma dedicada a la excelencia académica, facilitando el acceso a investigaciones de alto impacto y proporcionando herramientas robustas para la comunidad científica y editorial.
@@ -33,7 +33,7 @@
         </div>
 
         <div class="mt-16 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-semibold text-slate-400 uppercase tracking-widest text-center md:text-left">
-            <p>© {{ date('Y') }} Joulaar. Todos los derechos reservados.</p>
+            <p>© {{ date('Y') }} Sagedi. Todos los derechos reservados.</p>
         </div>
     </div>
 </footer>

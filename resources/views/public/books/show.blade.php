@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', $book->title)
-@section('meta_description', Str::limit($book->description ?? 'Publicación académica de acceso abierto — Joulaar.', 160))
+@section('meta_description', Str::limit($book->description ?? 'Publicación académica de acceso abierto — Sagedi.', 160))
 
 @section('content')
 
