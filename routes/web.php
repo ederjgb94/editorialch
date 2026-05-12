@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
 // Rutas para Administradores
 // ══════════════════════════════════════════════
 
-Route::middleware(['auth', 'role:admin'])->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('books', AdminBookController::class);
     Route::resource('users', UserController::class);
