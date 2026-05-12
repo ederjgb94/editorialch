@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', 'Sagedi — Journal of Latin American Academic Research')
-@section('meta_description', 'Editorial de acceso abierto totalmente en línea. Journal of Latin American Academic Research (ISSN 2572-0619).')
+@section('title', 'Sagedi — Sagan Editors')
+@section('meta_description', 'Editorial de acceso abierto totalmente en línea. Sagan Editors (ISSN 2572-0619).')
 
 @section('content')
 
@@ -22,7 +22,7 @@
                     Sagedi
                 </h1>
                 <p class="text-lg md:text-2xl text-blue-100 font-normal tracking-wide" style="font-family:'Source Sans 3',ui-sans-serif,sans-serif;">
-                    Journal of Latin American Academic Research
+                    Sagan Editors
                     <span class="block text-xs md:text-sm font-light mt-2 text-blue-300/80 tracking-[0.3em] uppercase">(ISSN 2572-0619)</span>
                 </p>
                 <div class="h-px w-24 bg-blue-500/40 mx-auto"></div>

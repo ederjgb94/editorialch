@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Sagedi') | Journal of Latin American Academic Research</title>
-    <meta name="description" content="@yield('meta_description', 'Sagedi — Editorial de acceso abierto totalmente en línea. Journal of Latin American Academic Research (ISSN 2572-0619).')">
+    <title>@yield('title', 'Sagedi') | Sagan Editors</title>
+    <meta name="description" content="@yield('meta_description', 'Sagedi — Editorial de acceso abierto totalmente en línea. Sagan Editors (ISSN 2572-0619).')">
 
     <!-- Scripts y Estilos -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
