@@ -30,18 +30,20 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', Rules\Password::defaults()],
             'role' => ['required', 'string', 'exists:roles,slug'],
+            'link_profile' => ['nullable', 'url', 'max:255'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'link_profile' => $request->link_profile,
         ]);
 
         $user->assignRole($request->role);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Usuario creado exitosamente');
+            ->with('success', 'Usuario creado exitosamente.');
     }
 
     public function edit(User $user)
@@ -56,11 +58,13 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'role' => ['required', 'string', 'exists:roles,slug'],
+            'link_profile' => ['nullable', 'url', 'max:255'],
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'link_profile' => $request->link_profile,
         ]);
 
         // Actualizar rol
@@ -68,13 +72,13 @@ class UserController extends Controller
         $user->assignRole($request->role);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'Usuario actualizado exitosamente');
+            ->with('success', 'Usuario actualizado exitosamente.');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
         return redirect()->route('admin.users.index')
-            ->with('success', 'Usuario eliminado exitosamente');
+            ->with('success', 'Usuario eliminado exitosamente.');
     }
 }

@@ -12,9 +12,24 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Book::paginate(10));
+        $query = Book::query();
+
+        if ($request->has('q')) {
+            $search = $request->get('q');
+            // Split search terms to allow matching multiple words
+            $keywords = explode(' ', $search);
+
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $q->orWhere('title', 'like', "%{$keyword}%")
+                        ->orWhere('partner', 'like', "%{$keyword}%");
+                }
+            });
+        }
+
+        return response()->json($query->orderBy('publication_date', 'desc')->paginate(10));
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminBookController extends Controller
 {
@@ -32,21 +33,33 @@ class AdminBookController extends Controller
             'volume' => 'nullable|integer',
             'pages' => 'nullable|integer',
             'description' => 'nullable|string',
-            'cover' => 'nullable|image|max:2048',
+            'cover' => 'nullable|mimes:pdf|max:10240',
+            'image' => 'nullable|image|max:2048',
             'pdf_file' => 'nullable|mimes:pdf|max:10240'
         ]);
 
+        $isbn = Str::slug($validated['isbn']);
+
         if ($request->hasFile('cover')) {
-            $validated['cover'] = $request->file('cover')->store('covers', 'public');
+            $validated['cover'] = $request->file('cover')->storeAs('portadas', $isbn . '_portada.pdf', 'public');
+        }
+
+        if ($request->hasFile('image')) {
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $validated['image'] = $request->file('image')->storeAs('imagenes', $isbn . '.' . $ext, 'public');
         }
 
         if ($request->hasFile('pdf_file')) {
-            $isbn = $validated['isbn'];
             $validated['pdf_path'] = $request->file('pdf_file')->storeAs('libros', $isbn . '.pdf', 'public');
         }
 
-        Book::create($validated);
-        return redirect()->route('admin.books.index')->with('success', 'Libro creado exitosamente');
+        $book = Book::create($validated);
+        return redirect()->route('admin.books.show', $book)->with('action', 'created');
+    }
+
+    public function show(Book $book)
+    {
+        return view('admin.books.success', compact('book'));
     }
 
     public function edit(Book $book)
@@ -66,61 +79,65 @@ class AdminBookController extends Controller
             'volume' => 'nullable|integer',
             'pages' => 'nullable|integer',
             'description' => 'nullable|string',
-            'cover' => 'nullable|image|max:2048',
+            'cover' => 'nullable|mimes:pdf|max:10240',
+            'image' => 'nullable|image|max:2048',
             'pdf_file' => 'nullable|mimes:pdf|max:10240'
         ]);
 
+        $isbn = Str::slug($validated['isbn']);
+
         if ($request->hasFile('cover')) {
-            // Eliminar la imagen anterior si existe
             if ($book->cover) {
                 Storage::disk('public')->delete($book->cover);
             }
-            $validated['cover'] = $request->file('cover')->store('covers', 'public');
+            $validated['cover'] = $request->file('cover')->storeAs('portadas', $isbn . '_portada.pdf', 'public');
+        }
+
+        if ($request->hasFile('image')) {
+            if ($book->image) {
+                Storage::disk('public')->delete($book->image);
+            }
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $validated['image'] = $request->file('image')->storeAs('imagenes', $isbn . '.' . $ext, 'public');
         }
 
         if ($request->hasFile('pdf_file')) {
-            // Eliminar el PDF anterior si existe
             if ($book->pdf_path) {
                 Storage::disk('public')->delete($book->pdf_path);
             }
-            $isbn = $validated['isbn'];
             $validated['pdf_path'] = $request->file('pdf_file')->storeAs('libros', $isbn . '.pdf', 'public');
         }
 
         $book->update($validated);
-        return redirect()->route('admin.books.index')->with('success', 'Libro actualizado exitosamente');
+        return redirect()->route('admin.books.show', $book)->with('action', 'updated');
     }
 
     public function destroy(Book $book)
     {
-        // Eliminar archivos asociados
         if ($book->cover) {
             Storage::disk('public')->delete($book->cover);
+        }
+        if ($book->image) {
+            Storage::disk('public')->delete($book->image);
         }
         if ($book->pdf_path) {
             Storage::disk('public')->delete($book->pdf_path);
         }
 
         $book->delete();
-        return redirect()->route('admin.books.index')->with('success', 'Libro eliminado exitosamente');
+        return redirect()->route('admin.books.index')->with('success', 'Libro eliminado exitosamente.');
     }
 
     public function search(Request $request)
     {
         $search = $request->get('search');
 
-        // Si no hay término de búsqueda, redirigir al index
         if (empty($search)) {
             return redirect()->route('admin.books.index');
         }
 
-        // Primero obtenemos los libros que coinciden con la búsqueda
         $matchingBooks = Book::where('title', 'LIKE', "%{$search}%");
-
-        // Luego obtenemos los libros que no coinciden con la búsqueda
         $otherBooks = Book::where('title', 'NOT LIKE', "%{$search}%");
-
-        // Unimos ambas consultas usando union
         $books = $matchingBooks->union($otherBooks)->paginate(10);
 
         return view('admin.books.index', compact('books', 'search'));

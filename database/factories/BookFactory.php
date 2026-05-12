@@ -27,10 +27,15 @@ class BookFactory extends Factory
             Storage::makeDirectory('public/libros');
         }
 
-        // Create a simple PDF file with the ISBN as content
+        // Copy a simple valid PDF file instead of creating corrupted text 
         if (!Storage::exists("public/{$pdfPath}")) {
-            $pdfContent = "Sample PDF for book with ISBN: {$isbn}";
-            Storage::put("public/{$pdfPath}", $pdfContent);
+            if (Storage::exists("public/dummy.pdf")) {
+                Storage::copy("public/dummy.pdf", "public/{$pdfPath}");
+            } else {
+                // Creates minimal valid PDF structure just in case the dummy was not downloaded
+                $minimalPdf = "%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\ntrailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n188\n%%EOF";
+                Storage::put("public/{$pdfPath}", $minimalPdf);
+            }
         }
 
         return [
