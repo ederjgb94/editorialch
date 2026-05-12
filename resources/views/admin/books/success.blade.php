@@ -71,7 +71,7 @@
 
             {{-- Acciones --}}
             <div class="flex flex-col items-center justify-center gap-3">
-                <a href="{{ route('books.show', $book) }}"
+                <a href="{{ route('books.public.show', $book) }}" target="_blank"
                     class="w-full inline-flex items-center justify-center px-6 py-3.5 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-[#013243] hover:bg-[#013243]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#013243] transition-colors">
                     <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
