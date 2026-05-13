@@ -1,11 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /admin/
 
-    # Si la petición ya viene con /public/, no hacemos nada
-    RewriteCond %{REQUEST_URI} !^/admin/public/
+    # Si la petici��n ya viene con /public/, no hacemos nada
+    RewriteCond %{REQUEST_URI} !^/public/
 
     # Mover todo lo que llegue a la carpeta /public
-    # Esto incluye imágenes, PDFs y el index.php de Laravel
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
